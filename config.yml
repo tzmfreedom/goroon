@@ -1,0 +1,3 @@
+notification_types:
+  desktop: true
+  email: true
