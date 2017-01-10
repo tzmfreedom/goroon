@@ -143,13 +143,6 @@ func (c *Cli) Run(args []string) error {
 					fmt.Println("%s: %s - %s", event.Detail,
 						event.When.Datetime.Start.Format("2006-01-02T15:04:05"),
 						event.When.Datetime.End.Format("2006-01-02T15:04:05"))
-					dt := event.When.Datetime
-					if dt.Start.Add(-10 * time.Minute).Before(time.Now()) {
-						if c.Config.NotificationTypes.Desktop {
-							c.Notifier.Notify(event.Detail, "")
-							c.Dbclient.UpdateRecord(event, true)
-						}
-					}
 				}
 				return nil
 			},
