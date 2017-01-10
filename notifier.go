@@ -12,7 +12,7 @@ func NewNotifier() *Notifier {
 	return n
 }
 
-func (n *Notifier) Notify(title string, subTitle string) error {
+func (n *Notifier) Notify(title string, subTitle string, url string) error {
 	//At a minimum specifiy a message to display to end-user.
 	note := gosxnotifier.NewNotification(title)
 
@@ -33,7 +33,7 @@ func (n *Notifier) Notify(title string, subTitle string) error {
 
 	//Optionally, specifiy a url or bundleid to open should the notification be
 	//clicked.
-	note.Link = "http://www.yahoo.com" //or BundleID like: com.apple.Terminal
+	note.Link = url //or BundleID like: com.apple.Terminal
 
 	//Optionally, an app icon (10.9+ ONLY)
 	//note.AppIcon = "gopher.png"

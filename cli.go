@@ -216,7 +216,7 @@ func (c *Cli) loop() error {
 			dt := event.When.Datetime
 			if dt.Start.Add(-10 * time.Minute).Before(time.Now()) {
 				if c.Config.NotificationTypes.Desktop {
-					c.Notifier.Notify(event.Detail, "")
+					c.Notifier.Notify(event.Detail, "", c.Config.Endpoint + "/schedule/view?event=" + event.Id)
 					dbClient.UpdateRecord(event, true)
 				}
 			}
