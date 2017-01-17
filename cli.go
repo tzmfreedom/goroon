@@ -184,16 +184,16 @@ func (c *Cli) loop() error {
 			return err
 		}
 
-		events := []ScheduleEventStorage{}
-		dbClient.Db.Select(&events, "SELECT * FROM schedule_events")
+		events_from_db := []ScheduleEventStorage{}
+		dbClient.Db.Select(&events_from_db, "SELECT * FROM schedule_events WHERE is_notify = false")
 
-		for _, event := range response.ResponseBody.ScheduleEvents {
+		for _, event_from_response := range response.ResponseBody.ScheduleEvents {
 			isCreate := true
 			isNotify := false
-			for _, event_temp := range events {
-				if event_temp.Id == event.Id {
+			for _, event_from_db := range events_from_db {
+				if event_from_db.Id == event_from_response.Id {
 					isCreate = false
-					isNotify = event_temp.IsNotify
+					isNotify = event_from_db.IsNotify
 					break
 				}
 			}
@@ -201,16 +201,20 @@ func (c *Cli) loop() error {
 				continue
 			}
 			if isCreate {
-				dbClient.CreateRecord(event)
+				dbClient.CreateRecord(event_from_response)
 			} else {
-				dbClient.UpdateRecord(event, false)
+				dbClient.UpdateRecord(event_from_response, false)
 			}
 
-			dt := event.When.Datetime
+			dt := event_from_response.When.Datetime
 			if dt.Start.Add(-10 * time.Minute).Before(time.Now()) {
 				if c.Config.NotificationTypes.Desktop {
-					c.Notifier.Notify(event.Detail, "", c.Config.Endpoint + "/schedule/view?event=" + event.Id)
-					dbClient.UpdateRecord(event, true)
+					c.Notifier.Notify(
+						event_from_response.Detail,
+						"",
+						c.Config.Endpoint + "/schedule/view?event=" + event_from_response.Id
+					)
+					dbClient.UpdateRecord(event_from_response, true)
 				}
 			}
 		}
