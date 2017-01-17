@@ -140,9 +140,15 @@ func (c *Cli) Run(args []string) error {
 				}
 
 				for _, event := range response.ResponseBody.ScheduleEvents {
-					fmt.Println("%s: %s - %s", event.Detail,
-						event.When.Datetime.Start.Format("2006-01-02T15:04:05"),
-						event.When.Datetime.End.Format("2006-01-02T15:04:05"))
+					if event.When.Datetime != nil {
+						fmt.Println("%s: %s - %s", event.Detail,
+							event.When.Datetime.Start.Format("2006-01-02T15:04:05"),
+							event.When.Datetime.End.Format("2006-01-02T15:04:05"))
+					} else if event.When.Date != nil {
+						fmt.Println("%s: %s - %s", event.Detail,
+							event.When.Date.Start.Format("2006-01-02"),
+							event.When.Date.End.Format("2006-01-02"))
+					}
 				}
 				return nil
 			},
