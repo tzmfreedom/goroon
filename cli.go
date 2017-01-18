@@ -32,7 +32,6 @@ type NotificationTypes struct {
 func NewCli() *Cli {
 	return &Cli{
 		Notifier: NewNotifier(),
-		Notifier: &Notifier{},
 		Config: &Config{
 			NotificationTypes: &NotificationTypes{
 				Desktop: true,
@@ -88,13 +87,13 @@ func (c *Cli) Run(args []string) error {
 			},
 			Action: func(ctx *cli.Context) error {
 				if c.Config.Configfile != "" {
-					err := c.loadYaml(c.Config.Configfile)
+					err = c.loadYaml(c.Config.Configfile)
 					if err != nil {
 						return err
 					}
 				}
 
-				c.loop()
+				err = c.loop()
 				return nil
 			},
 		},
@@ -140,15 +139,9 @@ func (c *Cli) Run(args []string) error {
 				}
 
 				for _, event := range response.ResponseBody.ScheduleEvents {
-					if event.When.Datetime != nil {
-						fmt.Println("%s: %s - %s", event.Detail,
-							event.When.Datetime.Start.Format("2006-01-02T15:04:05"),
-							event.When.Datetime.End.Format("2006-01-02T15:04:05"))
-					} else if event.When.Date != nil {
-						fmt.Println("%s: %s - %s", event.Detail,
-							event.When.Date.Start.Format("2006-01-02"),
-							event.When.Date.End.Format("2006-01-02"))
-					}
+					fmt.Println("%s: %s - %s", event.Detail,
+						event.When.Datetime.Start.Format("2006-01-02T15:04:05"),
+						event.When.Datetime.End.Format("2006-01-02T15:04:05"))
 				}
 				return nil
 			},
@@ -191,7 +184,7 @@ func (c *Cli) loop() error {
 		}
 
 		events_from_db := []ScheduleEventStorage{}
-		dbClient.Db.Select(&events_from_db, "SELECT * FROM schedule_events WHERE is_notify = false")
+		dbClient.Db.Select(&events_from_db, fmt.Sprintf("SELECT * FROM schedule_events WHERE created_at > '%s'", now.Format("2006-01-02")))
 
 		for _, event_from_response := range response.ResponseBody.ScheduleEvents {
 			isCreate := true
@@ -218,7 +211,7 @@ func (c *Cli) loop() error {
 					c.Notifier.Notify(
 						event_from_response.Detail,
 						"",
-						c.Config.Endpoint + "/schedule/view?event=" + event_from_response.Id
+						fmt.Sprintf("%s/schedule/view?event=%d", c.Config.Endpoint, event_from_response.Id),
 					)
 					dbClient.UpdateRecord(event_from_response, true)
 				}
