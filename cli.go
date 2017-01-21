@@ -184,7 +184,7 @@ func (c *Cli) loop() error {
 		}
 
 		events_from_db := []ScheduleEventStorage{}
-		dbClient.Db.Select(&events_from_db, fmt.Sprintf("SELECT * FROM schedule_events WHERE created_at > '%s'", now.Format("2006-01-02")))
+		dbClient.Db.Select(&events_from_db, fmt.Sprintf("SELECT * FROM schedule_events WHERE start > '%s'", now.Format("2006-01-02")))
 
 		for _, event_from_response := range response.ResponseBody.ScheduleEvents {
 			isCreate := true
