@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"os"
+	"github.com/tzmfreedom/goroon"
 )
 
 type DBClient struct {
@@ -32,12 +33,12 @@ func CreateDatabase() {
 	os.Create("./data.db")
 }
 
-func (c *DBClient) CreateRecord(event ScheduleEvent) {
+func (c *DBClient) CreateRecord(event goroon.ScheduleEvent) {
 	sql := `INSERT INTO schedule_events (id, detail, description, start, end) VALUES (%d, '%s', '%s', '%s', '%s')`
 	c.Exec(fmt.Sprintf(sql, event.Id, event.Detail, event.Description, event.When.Datetime.Start.Format("2006-01-02T15:04:05"), event.When.Datetime.End.Format("2006-01-02T15:04:05")))
 }
 
-func (c *DBClient) UpdateRecord(event ScheduleEvent, isNotify bool) {
+func (c *DBClient) UpdateRecord(event goroon.ScheduleEvent, isNotify bool) {
 	sql := `UPDATE schedule_events SET detail='%s', description='%s', start='%s', end='%s', is_notify='%t' WHERE id=%d`
 	bind_sql := fmt.Sprintf(sql, event.Detail, event.Description, event.When.Datetime.Start.Format("2006-01-02T15:04:05"), event.When.Datetime.End.Format("2006-01-02T15:04:05"), isNotify, event.Id)
 	c.Exec(bind_sql)

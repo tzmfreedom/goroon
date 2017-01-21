@@ -7,13 +7,14 @@ import (
 
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
+	"github.com/tzmfreedom/goroon"
 )
 
 type Cli struct {
 	Config       *Config
 	Notifier     *Notifier
 	Dbclient     *DBClient
-	Garoonclient *GaroonClient
+	Garoonclient *goroon.GaroonClient
 }
 
 type Config struct {
@@ -128,7 +129,7 @@ func (c *Cli) Run(args []string) error {
 			},
 			Action: func(ctx *cli.Context) error {
 				now := time.Now()
-				c.Garoonclient = NewGaroonClient(c.Config.Username, c.Config.Password, c.Config.Endpoint)
+				c.Garoonclient = goroon.NewGaroonClient(c.Config.Username, c.Config.Password, c.Config.Endpoint)
 				response, err := c.Garoonclient.Request(
 					c.Config.Userid,
 					time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local),
@@ -170,7 +171,7 @@ func (c *Cli) loop() error {
 		return err
 	}
 	now := time.Now()
-	c.Garoonclient = NewGaroonClient(c.Config.Username, c.Config.Password, c.Config.Endpoint)
+	c.Garoonclient = goroon.NewGaroonClient(c.Config.Username, c.Config.Password, c.Config.Endpoint)
 
 	for {
 
