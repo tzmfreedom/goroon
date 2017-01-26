@@ -8,6 +8,7 @@ import (
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 	"github.com/tzmfreedom/goroon"
+        "github.com/k0kubun/pp"
 )
 
 type Cli struct {
@@ -171,15 +172,16 @@ func (c *Cli) loop() error {
 		return err
 	}
 	now := time.Now()
+        yesterday := now.AddDate(0, 0, -1)
 	c.Garoonclient = goroon.NewGaroonClient(c.Config.Username, c.Config.Password, c.Config.Endpoint)
 
 	for {
-
 		response, err := c.Garoonclient.Request(
 			c.Config.Userid,
-			time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local),
-			time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, time.Local),
+			time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 15, 0, 0, 0, time.Local),
+			time.Date(now.Year(), now.Month(), now.Day(), 14, 59, 59, 0, time.Local),
 		)
+                pp.Print(response)
 		if err != nil {
 			return err
 		}
@@ -201,10 +203,14 @@ func (c *Cli) loop() error {
 				continue
 			}
 			if isCreate {
-				dbClient.CreateRecord(event_from_response)
+				err = dbClient.CreateRecord(event_from_response)
 			} else {
-				dbClient.UpdateRecord(event_from_response, false)
+                                err = dbClient.UpdateRecord(event_from_response, false)
 			}
+
+                        if err != nil {
+                                panic(err)
+                        }
 
 			dt := event_from_response.When.Datetime
 			if dt.Start.Add(-10 * time.Minute).Before(time.Now()) {

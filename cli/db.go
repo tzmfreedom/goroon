@@ -33,15 +33,15 @@ func CreateDatabase() {
 	os.Create("./data.db")
 }
 
-func (c *DBClient) CreateRecord(event goroon.ScheduleEvent) {
+func (c *DBClient) CreateRecord(event goroon.ScheduleEvent) error {
 	sql := `INSERT INTO schedule_events (id, detail, description, start, end) VALUES (%d, '%s', '%s', '%s', '%s')`
-	c.Exec(fmt.Sprintf(sql, event.Id, event.Detail, event.Description, event.When.Datetime.Start.Format("2006-01-02T15:04:05"), event.When.Datetime.End.Format("2006-01-02T15:04:05")))
+	return c.Exec(fmt.Sprintf(sql, event.Id, event.Detail, event.Description, event.When.Datetime.Start.Format("2006-01-02T15:04:05"), event.When.Datetime.End.Format("2006-01-02T15:04:05")))
 }
 
-func (c *DBClient) UpdateRecord(event goroon.ScheduleEvent, isNotify bool) {
+func (c *DBClient) UpdateRecord(event goroon.ScheduleEvent, isNotify bool) error {
 	sql := `UPDATE schedule_events SET detail='%s', description='%s', start='%s', end='%s', is_notify='%t' WHERE id=%d`
 	bind_sql := fmt.Sprintf(sql, event.Detail, event.Description, event.When.Datetime.Start.Format("2006-01-02T15:04:05"), event.When.Datetime.End.Format("2006-01-02T15:04:05"), isNotify, event.Id)
-	c.Exec(bind_sql)
+	return c.Exec(bind_sql)
 }
 
 func (c *DBClient) CreateTable() {

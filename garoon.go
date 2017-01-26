@@ -192,6 +192,7 @@ func (g *GaroonClient) Request(userId string, start time.Time, end time.Time) (r
 </soap:Envelope>`
 
 	soapMessage := fmt.Sprintf(soapTemplate, g.Username, g.Password, start.Format("2006-01-02T15:04:05"), end.Format("2006-01-02T15:04:05"), userId)
+        fmt.Println(soapMessage)
 	resp, err := http.Post(fmt.Sprintf("%s/cbpapi/schedule/api", g.Endpoint), "text/xml", strings.NewReader(soapMessage))
 	if err != nil {
 		return
