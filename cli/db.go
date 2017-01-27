@@ -4,8 +4,8 @@ import (
 	_ "database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"os"
 	"github.com/tzmfreedom/goroon"
+	"os"
 )
 
 type DBClient struct {

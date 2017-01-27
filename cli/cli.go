@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"time"
 
+	"github.com/k0kubun/pp"
+	"github.com/tzmfreedom/goroon"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
-	"github.com/tzmfreedom/goroon"
-        "github.com/k0kubun/pp"
 )
 
 type Cli struct {
@@ -172,7 +172,7 @@ func (c *Cli) loop() error {
 		return err
 	}
 	now := time.Now()
-        yesterday := now.AddDate(0, 0, -1)
+	yesterday := now.AddDate(0, 0, -1)
 	c.Garoonclient = goroon.NewGaroonClient(c.Config.Username, c.Config.Password, c.Config.Endpoint)
 
 	for {
@@ -181,7 +181,7 @@ func (c *Cli) loop() error {
 			time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 15, 0, 0, 0, time.Local),
 			time.Date(now.Year(), now.Month(), now.Day(), 14, 59, 59, 0, time.Local),
 		)
-                pp.Print(response)
+		pp.Print(response)
 		if err != nil {
 			return err
 		}
@@ -192,6 +192,10 @@ func (c *Cli) loop() error {
 		for _, event_from_response := range response.ResponseBody.ScheduleEvents {
 			isCreate := true
 			isNotify := false
+
+			if event_from_response.EventType == "banner" {
+				continue
+			}
 			for _, event_from_db := range events_from_db {
 				if event_from_db.Id == event_from_response.Id {
 					isCreate = false
@@ -205,12 +209,12 @@ func (c *Cli) loop() error {
 			if isCreate {
 				err = dbClient.CreateRecord(event_from_response)
 			} else {
-                                err = dbClient.UpdateRecord(event_from_response, false)
+				err = dbClient.UpdateRecord(event_from_response, false)
 			}
 
-                        if err != nil {
-                                panic(err)
-                        }
+			if err != nil {
+				panic(err)
+			}
 
 			dt := event_from_response.When.Datetime
 			if dt.Start.Add(-10 * time.Minute).Before(time.Now()) {

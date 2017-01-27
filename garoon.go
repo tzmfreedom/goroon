@@ -38,6 +38,7 @@ type ScheduleEvent struct {
 	Detail      string       `xml:"detail,attr"`
 	Description string       `xml:"description,attr"`
 	Id          int          `xml:"id,attr"`
+        EventType   string       `xml:"event_type,attr"`
 }
 
 type RepeatInfo struct {
