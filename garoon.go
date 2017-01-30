@@ -210,3 +210,17 @@ func (g *GaroonClient) Request(userId string, start time.Time, end time.Time) (r
 func (event *ScheduleEvent) IsBanner() bool {
 	return event.EventType == "banner"
 }
+
+func (event *ScheduleEvent) GetStartStr() string {
+	if event.IsBanner() {
+		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
+	}
+	return event.When.Datetime.Start.Format("2006-01-02T15:04:05")
+}
+
+func (event *ScheduleEvent) GetEndStr() string {
+	if event.IsBanner() {
+		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
+	}
+	return event.When.Datetime.End.Format("2006-01-02T15:04:05")
+}

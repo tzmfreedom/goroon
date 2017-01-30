@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/k0kubun/pp"
 	"github.com/tzmfreedom/goroon"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
@@ -141,9 +140,7 @@ func (c *Cli) Run(args []string) error {
 				}
 
 				for _, event := range response.ResponseBody.ScheduleEvents {
-					fmt.Println("%s: %s - %s", event.Detail,
-						event.When.Datetime.Start.Format("2006-01-02T15:04:05"),
-						event.When.Datetime.End.Format("2006-01-02T15:04:05"))
+					fmt.Println("%s: %s - %s", event.Detail, event.GetStartStr(), event.GetEndStr())
 				}
 				return nil
 			},
@@ -181,7 +178,6 @@ func (c *Cli) loop() error {
 			time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 15, 0, 0, 0, time.Local),
 			time.Date(now.Year(), now.Month(), now.Day(), 14, 59, 59, 0, time.Local),
 		)
-		pp.Print(response)
 		if err != nil {
 			return err
 		}
@@ -213,7 +209,7 @@ func (c *Cli) loop() error {
 			}
 
 			if err != nil {
-				panic(err)
+				return err
 			}
 
 			dt := event_from_response.When.Datetime
