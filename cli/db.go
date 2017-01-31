@@ -46,13 +46,13 @@ func (c *DBClient) UpdateRecord(event goroon.ScheduleEvent, isNotify bool) error
 
 func (c *DBClient) CreateTable() {
 	q := `CREATE TABLE schedule_events (
-	id INTEGER PRIMARY KEY
+	id TEXT PRIMARY KEY
 	, description TEXT NOT NULL
 	, detail TEXT NOT NULL
 	, start TIMESTAMP NOT NULL
 	, end TIMESTAMP NOT NULL
 	, is_notify BOOL NOT NULL DEFAULT false
-	, created_at TIMESTAMP DEFAULT (DATETIME('now','localtime'))
+	, created_at TEXT DEFAULT (DATETIME('now','localtime'))
 	)`
 	c.Exec(q)
 }

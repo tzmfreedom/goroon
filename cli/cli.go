@@ -24,6 +24,7 @@ type Config struct {
 	Endpoint          string
 	Userid            string
 	Configfile        string
+	Debug	          bool
 }
 
 type NotificationTypes struct {
@@ -85,6 +86,10 @@ func (c *Cli) Run(args []string) error {
 					Name:        "config, c",
 					Destination: &c.Config.Configfile,
 				},
+				cli.BoolFlag{
+					Name:        "debug",
+					Destination: &c.Config.Debug,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
 				if c.Config.Configfile != "" {
@@ -125,6 +130,10 @@ func (c *Cli) Run(args []string) error {
 				cli.StringFlag{
 					Name:        "config, c",
 					Destination: &c.Config.Configfile,
+				},
+				cli.BoolFlag{
+					Name:        "debug",
+					Destination: &c.Config.Debug,
 				},
 			},
 			Action: func(ctx *cli.Context) error {
@@ -193,7 +202,7 @@ func (c *Cli) loop() error {
 				continue
 			}
 			for _, event_from_db := range events_from_db {
-				if event_from_db.Id == event_from_response.Id {
+				if fmt.Sprint(event_from_db.Id) == event_from_response.GetId() {
 					isCreate = false
 					isNotify = event_from_db.IsNotify
 					break

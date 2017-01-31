@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"os"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -93,10 +95,22 @@ func (c *xmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
 	return nil
 }
 
+type Logger struct {
+	outStream io.Writer
+}
+
+func NewLogger(outStream io.Writer) *Logger {
+	return &Logger{
+		outStream: outStream,
+	}
+}
+
 type GaroonClient struct {
 	Username string
 	Password string
 	Endpoint string
+	IsDebug	 bool
+	Logger	 *Logger
 }
 
 func NewGaroonClient(username string, password string, endpoint string) *GaroonClient {
@@ -104,7 +118,12 @@ func NewGaroonClient(username string, password string, endpoint string) *GaroonC
 		Username: username,
 		Password: password,
 		Endpoint: endpoint,
+		Logger: NewLogger(os.Stdout),
 	}
+}
+
+func (client *GaroonClient)SetDebug(isDebug bool) {
+	client.IsDebug = isDebug
 }
 
 func emulateResponse() string {
@@ -155,14 +174,6 @@ xmlns:schedule="http://wsdl.cybozu.co.jp/schedule/2008">
 	return soapResponse
 }
 
-//func (g *GaroonClient)Request(userId string, start time.Time, end time.Time) (res *Envelope, err error) {
-//	soapResponse := emulateResponse()
-//	res = &Envelope{}
-//	err = xml.Unmarshal([]byte(soapResponse), res)
-//	pp.Print(res)
-//	return
-//}
-
 func (g *GaroonClient) Request(userId string, start time.Time, end time.Time) (res *Envelope, err error) {
 	soapTemplate := `<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope
@@ -193,7 +204,7 @@ func (g *GaroonClient) Request(userId string, start time.Time, end time.Time) (r
 </soap:Envelope>`
 
 	soapMessage := fmt.Sprintf(soapTemplate, g.Username, g.Password, start.Format("2006-01-02T15:04:05"), end.Format("2006-01-02T15:04:05"), userId)
-	fmt.Println(soapMessage)
+	g.Debug(soapMessage)
 	resp, err := http.Post(fmt.Sprintf("%s/cbpapi/schedule/api", g.Endpoint), "text/xml", strings.NewReader(soapMessage))
 	if err != nil {
 		return
@@ -223,4 +234,26 @@ func (event *ScheduleEvent) GetEndStr() string {
 		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
 	}
 	return event.When.Datetime.End.Format("2006-01-02T15:04:05")
+}
+
+func (event *ScheduleEvent) GetId() string {
+	var tm int64
+	if event.IsBanner() {
+		tm = event.When.Date.Start.Unix()
+	} else {
+		tm = event.When.Datetime.Start.Unix()
+	}
+	return fmt.Sprintf("%s-%s", event.GetId(), tm)
+}
+
+func (client *GaroonClient) Debugf(format string, args ...interface{}) {
+	if client.IsDebug {
+		fmt.Printf(format, args...)
+	}
+}
+
+func (client *GaroonClient) Debug(message string) {
+	if client.IsDebug {
+		fmt.Println(message)
+	}
 }
