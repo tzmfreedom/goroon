@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"os"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -109,8 +109,8 @@ type GaroonClient struct {
 	Username string
 	Password string
 	Endpoint string
-	IsDebug	 bool
-	Logger	 *Logger
+	IsDebug  bool
+	Logger   *Logger
 }
 
 func NewGaroonClient(username string, password string, endpoint string) *GaroonClient {
@@ -118,11 +118,11 @@ func NewGaroonClient(username string, password string, endpoint string) *GaroonC
 		Username: username,
 		Password: password,
 		Endpoint: endpoint,
-		Logger: NewLogger(os.Stdout),
+		Logger:   NewLogger(os.Stdout),
 	}
 }
 
-func (client *GaroonClient)SetDebug(isDebug bool) {
+func (client *GaroonClient) SetDebug(isDebug bool) {
 	client.IsDebug = isDebug
 }
 
@@ -213,6 +213,7 @@ func (g *GaroonClient) Request(userId string, start time.Time, end time.Time) (r
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	soapResponse := bytes.NewBuffer(body).String()
+	g.Debug(soapResponse)
 	res = &Envelope{}
 	err = xml.Unmarshal([]byte(soapResponse), res)
 	return

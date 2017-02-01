@@ -24,7 +24,7 @@ type Config struct {
 	Endpoint          string
 	Userid            string
 	Configfile        string
-	Debug	          bool
+	Debug             bool
 }
 
 type NotificationTypes struct {
@@ -179,7 +179,9 @@ func (c *Cli) loop() error {
 	}
 	now := time.Now()
 	yesterday := now.AddDate(0, 0, -1)
-	c.Garoonclient = goroon.NewGaroonClient(c.Config.Username, c.Config.Password, c.Config.Endpoint)
+	garoonClient := goroon.NewGaroonClient(c.Config.Username, c.Config.Password, c.Config.Endpoint)
+	garoonClient.SetDebug(c.Config.Debug)
+	c.Garoonclient = garoonClient
 
 	for {
 		response, err := c.Garoonclient.Request(
