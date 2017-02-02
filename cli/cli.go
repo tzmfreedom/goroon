@@ -200,7 +200,7 @@ func (c *Cli) loop() error {
 			isCreate := true
 			isNotify := false
 
-			if event_from_response.EventType == "banner" {
+			if event_from_response.IsBanner() {
 				continue
 			}
 			for _, event_from_db := range events_from_db {

@@ -10,6 +10,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/Sirupsen/logrus"
 )
 
 type Envelope struct {
@@ -95,14 +97,11 @@ func (c *xmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
 	return nil
 }
 
-type Logger struct {
-	outStream io.Writer
-}
 
-func NewLogger(outStream io.Writer) *Logger {
-	return &Logger{
-		outStream: outStream,
-	}
+func NewLogger(outStream io.Writer) *logrus.Logger {
+	outLogger := logrus.New()
+	outLogger.Out = outStream
+	return outLogger
 }
 
 type GaroonClient struct {
@@ -110,7 +109,7 @@ type GaroonClient struct {
 	Password string
 	Endpoint string
 	IsDebug  bool
-	Logger   *Logger
+	Logger   *logrus.Logger
 }
 
 func NewGaroonClient(username string, password string, endpoint string) *GaroonClient {
@@ -124,54 +123,6 @@ func NewGaroonClient(username string, password string, endpoint string) *GaroonC
 
 func (client *GaroonClient) SetDebug(isDebug bool) {
 	client.IsDebug = isDebug
-}
-
-func emulateResponse() string {
-	// 本日分のスケジュールを取得
-	soapResponse := `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope
-xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-xmlns:schedule="http://wsdl.cybozu.co.jp/schedule/2008">
-<soap:Header>
-    <vendor>Cybozu</vendor>
-    <product>Garoon</product>
-    <product_type>1</product_type>
-    <version>3.7.5</version>
-    <apiversion>1.3.1</apiversion>
-</soap:Header>
-<soap:Body>
-    <schedule:ScheduleGetEventsByTargetResponse>
-        <returns>
-            <schedule_event id="123"
-                detail="fugafuga"
-                description="hogehoge"
-                >
-                <members xmlns="http://schemas.cybozu.co.jp/schedule/2008">
-                    <member>
-                        <user id="aa" name="bb" order="0" />
-                    </member>
-                </members>
-                <repeat_info xmlns="http://schemas.cybozu.co.jp/schedule/2008">
-                <condition type="week" day="20"
-                    week="2" start_date="2016-11-22" end_date="2017-04-01"
-                    start_time="14:00:00" end_time="14:30:00"/>
-                    <exclusive_datetimes>
-                        <exclusive_datetime start="2016-12-13T00:00:00+09:00" end="2016-12-14T00:00:00+09:00" />
-                        <exclusive_datetime start="2016-12-20T00:00:00+09:00" end="2016-12-21T00:00:00+09:00" />
-                    </exclusive_datetimes>
-                </repeat_info>
-                <when>
-                    <!--<datetime start="2016-12-15T13:07:00Z" end="2016-12-15T16:30:00Z" />-->
-                    <date start="2016-12-15" end="2016-12-16" />
-                </when>
-            </schedule_event>
-        </returns>
-    </schedule:ScheduleGetEventsByTargetResponse>
-</soap:Body>
-</soap:Envelope>`
-	return soapResponse
 }
 
 func (g *GaroonClient) Request(userId string, start time.Time, end time.Time) (res *Envelope, err error) {
@@ -247,14 +198,14 @@ func (event *ScheduleEvent) GetId() string {
 	return fmt.Sprintf("%s-%s", event.GetId(), tm)
 }
 
-func (client *GaroonClient) Debugf(format string, args ...interface{}) {
-	if client.IsDebug {
-		fmt.Printf(format, args...)
+func (g *GaroonClient) Debug(args ...interface{}) {
+	if g.IsDebug {
+		g.Logger.Debug(args...)
 	}
 }
 
-func (client *GaroonClient) Debug(message string) {
-	if client.IsDebug {
-		fmt.Println(message)
+func (g *GaroonClient) Debugf(format string, args ...interface{}) {
+	if g.IsDebug {
+		g.Logger.Debugf(format, args...)
 	}
 }
