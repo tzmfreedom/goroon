@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -97,35 +96,48 @@ func (c *xmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
 	return nil
 }
 
-
-func NewLogger(outStream io.Writer) *logrus.Logger {
+func newLogger(outStream io.Writer) *logrus.Logger {
 	outLogger := logrus.New()
 	outLogger.Out = outStream
 	return outLogger
 }
 
 type GaroonClient struct {
-	Username string
-	Password string
-	Endpoint string
-	IsDebug  bool
-	Logger   *logrus.Logger
+	username string
+	password string
+	endpoint string
+	debug    bool
+	logger   *logrus.Logger
 }
 
-func NewGaroonClient(username string, password string, endpoint string) *GaroonClient {
+func NewGaroonClient(username string, password string, endpoint string, debug bool, w io.Writer) *GaroonClient {
 	return &GaroonClient{
-		Username: username,
-		Password: password,
-		Endpoint: endpoint,
-		Logger:   NewLogger(os.Stdout),
+		username: username,
+		password: password,
+		endpoint: endpoint,
+		debug:    debug,
+		logger:   newLogger(w),
 	}
 }
 
-func (client *GaroonClient) SetDebug(isDebug bool) {
-	client.IsDebug = isDebug
+func (g *GaroonClient) Request(msg string, uri string, res interface{}) (err error) {
+	g.Debug(msg)
+
+	resp, err := http.Post(uri, "text/xml", strings.NewReader(msg))
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	g.Debug(bytes.NewBuffer(body).String())
+
+	err = xml.Unmarshal(body, res)
+	return
 }
 
-func (g *GaroonClient) Request(userId string, start time.Time, end time.Time) (res *Envelope, err error) {
+func (g *GaroonClient) ScheduleGetEventsByTarget(userId string, start time.Time, end time.Time, res *Envelope) (err error) {
 	soapTemplate := `<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope
   xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
@@ -153,21 +165,10 @@ func (g *GaroonClient) Request(userId string, start time.Time, end time.Time) (r
     </ScheduleGetEventsByTarget >
   </soap:Body>
 </soap:Envelope>`
-
-	soapMessage := fmt.Sprintf(soapTemplate, g.Username, g.Password, start.Format("2006-01-02T15:04:05"), end.Format("2006-01-02T15:04:05"), userId)
-	g.Debug(soapMessage)
-	resp, err := http.Post(fmt.Sprintf("%s/cbpapi/schedule/api", g.Endpoint), "text/xml", strings.NewReader(soapMessage))
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	soapResponse := bytes.NewBuffer(body).String()
-	g.Debug(soapResponse)
+	soapMessage := fmt.Sprintf(soapTemplate, g.username, g.password, start.Format("2006-01-02T15:04:05"), end.Format("2006-01-02T15:04:05"), userId)
+	uri := fmt.Sprintf("%s/cbpapi/schedule/api", g.endpoint)
 	res = &Envelope{}
-	err = xml.Unmarshal([]byte(soapResponse), res)
-	return
+	return g.Request(soapMessage, uri, res)
 }
 
 func (event *ScheduleEvent) IsBanner() bool {
@@ -199,13 +200,13 @@ func (event *ScheduleEvent) GetId() string {
 }
 
 func (g *GaroonClient) Debug(args ...interface{}) {
-	if g.IsDebug {
-		g.Logger.Debug(args...)
+	if g.debug {
+		g.logger.Debug(args...)
 	}
 }
 
 func (g *GaroonClient) Debugf(format string, args ...interface{}) {
-	if g.IsDebug {
-		g.Logger.Debugf(format, args...)
+	if g.debug {
+		g.logger.Debugf(format, args...)
 	}
 }
