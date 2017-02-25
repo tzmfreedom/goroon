@@ -11,12 +11,11 @@ import (
 )
 
 type config struct {
-	Username   string
-	Password   string
-	Endpoint   string
-	Userid     string
-	Configfile string
-	Debug      bool
+	Username string
+	Password string
+	Endpoint string
+	Userid   string
+	Debug    bool
 }
 
 func main() {
@@ -46,17 +45,17 @@ func main() {
 					EnvVar:      "GAROON_ENDPOINT",
 				},
 				cli.StringFlag{
-					Name:        "userid",
+					Name:        "userid, i",
 					Destination: &c.Userid,
 				},
 				cli.BoolFlag{
-					Name:        "debug",
+					Name:        "debug, d",
 					Destination: &c.Debug,
 				},
 			},
 			Action: func(ctx *cli.Context) error {
 				now := time.Now()
-				client := goroon.NewGaroonClient(c.Username, c.Password, c.Endpoint, false, os.Stdout)
+				client := goroon.NewGaroonClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
 				res := &goroon.Envelope{}
 				err := client.ScheduleGetEventsByTarget(
 					c.Userid,

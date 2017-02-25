@@ -96,17 +96,19 @@ func (c *xmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
 	return nil
 }
 
-func newLogger(outStream io.Writer) *logrus.Logger {
-	outLogger := logrus.New()
-	outLogger.Out = outStream
-	return outLogger
+func newLogger(outStream io.Writer, debug bool) *logrus.Logger {
+	l := logrus.New()
+	l.Out = outStream
+	if debug {
+		l.Level = logrus.DebugLevel
+	}
+	return l
 }
 
 type GaroonClient struct {
 	username string
 	password string
 	endpoint string
-	debug    bool
 	logger   *logrus.Logger
 }
 
@@ -115,14 +117,12 @@ func NewGaroonClient(username string, password string, endpoint string, debug bo
 		username: username,
 		password: password,
 		endpoint: endpoint,
-		debug:    debug,
-		logger:   newLogger(w),
+		logger:   newLogger(w, debug),
 	}
 }
 
 func (g *GaroonClient) Request(msg string, uri string, res interface{}) (err error) {
-	g.Debug(msg)
-
+	g.logger.Debug(msg)
 	resp, err := http.Post(uri, "text/xml", strings.NewReader(msg))
 	if err != nil {
 		return
@@ -131,7 +131,7 @@ func (g *GaroonClient) Request(msg string, uri string, res interface{}) (err err
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	g.Debug(bytes.NewBuffer(body).String())
+	g.logger.Debug(bytes.NewBuffer(body).String())
 
 	err = xml.Unmarshal(body, res)
 	return
@@ -189,24 +189,3 @@ func (event *ScheduleEvent) GetEndStr() string {
 	return event.When.Datetime.End.Format("2006-01-02T15:04:05")
 }
 
-func (event *ScheduleEvent) GetId() string {
-	var tm int64
-	if event.IsBanner() {
-		tm = event.When.Date.Start.Unix()
-	} else {
-		tm = event.When.Datetime.Start.Unix()
-	}
-	return fmt.Sprintf("%s-%s", event.GetId(), tm)
-}
-
-func (g *GaroonClient) Debug(args ...interface{}) {
-	if g.debug {
-		g.logger.Debug(args...)
-	}
-}
-
-func (g *GaroonClient) Debugf(format string, args ...interface{}) {
-	if g.debug {
-		g.logger.Debugf(format, args...)
-	}
-}
