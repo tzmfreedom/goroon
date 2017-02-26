@@ -55,27 +55,32 @@ func main() {
 			},
 			Action: func(ctx *cli.Context) error {
 				now := time.Now()
-				client := goroon.NewGaroonClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
-				res := &goroon.Envelope{}
-				err := client.ScheduleGetEventsByTarget(
-					c.Userid,
-					time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local),
-					time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, time.Local),
-					res,
-				)
+				client := goroon.NewClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
+				res := &goroon.ScheduleGetEventsByTargetResponse{}
+				req := &goroon.ScheduleGetEventsByTargetRequest{
+					Parameters: &goroon.Parameters{
+						Start: time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local),
+						End:   time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local),
+						User: &goroon.User{
+							Id: c.Userid,
+						},
+					},
+				}
+
+				err := client.ScheduleGetEventsByTarget(req, res)
 				if err != nil {
 					return err
 				}
 
-				for _, event := range res.ResponseBody.ScheduleEvents {
+				for _, event := range res.Returns.ScheduleEvents {
 					fmt.Println(strings.Join([]string{
 						fmt.Sprint(event.Id),
 						fmt.Sprint(event.Members),
 						event.EventType,
 						strings.Replace(event.Detail, "\n", "", -1),
 						strings.Replace(event.Description, "\n", "", -1),
-						event.GetStartStr(),
-						event.GetEndStr(),
+						startStr(event),
+						endStr(event),
 					}, "\t"))
 				}
 				return nil
@@ -83,4 +88,18 @@ func main() {
 		},
 	}
 	app.Run(os.Args)
+}
+
+func startStr(event *goroon.ScheduleEvent) string {
+	if event.EventType == "banner" {
+		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
+	}
+	return event.When.Datetime.Start.Format("2006-01-02T15:04:05")
+}
+
+func endStr(event *goroon.ScheduleEvent) string {
+	if event.EventType == "banner" {
+		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
+	}
+	return event.When.Datetime.End.Format("2006-01-02T15:04:05")
 }
