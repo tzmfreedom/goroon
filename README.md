@@ -1,9 +1,15 @@
-# GOROON
+# Goroon
 
-Garoon Scheduler Notifier by Go language
+Command Line Interface for Garoon with Go language
 
 ## Install
 
+Cli
+```
+go get github.com/tzmfreedom/goroon/goroon
+```
+
+Library
 ```
 go get github.com/tzmfreedom/goroon
 ```
