@@ -16,6 +16,8 @@ type config struct {
 	Endpoint string
 	Userid   string
 	Debug    bool
+	Start    string
+	End      string
 }
 
 func main() {
@@ -52,15 +54,32 @@ func main() {
 					Name:        "debug, d",
 					Destination: &c.Debug,
 				},
+				cli.StringFlag{
+					Name:        "start",
+					Destination: &c.Start,
+				},
+				cli.StringFlag{
+					Name:        "end",
+					Destination: &c.End,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
 				now := time.Now()
 				client := goroon.NewClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
+
+				start, err := time.Parse("2006-01-02 15:04:05", c.Start)
+				if err != nil {
+					return err
+				}
+				end, err := time.Parse("2006-01-02 15:04:05", c.End)
+				if err != nil {
+					return err
+				}
 				res := &goroon.ScheduleGetEventsByTargetResponse{}
 				req := &goroon.ScheduleGetEventsByTargetRequest{
 					Parameters: &goroon.Parameters{
-						Start: time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local),
-						End:   time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local),
+						Start: start,
+						End:   end,
 						User: &goroon.User{
 							Id: c.Userid,
 						},
