@@ -6,27 +6,27 @@ import (
 )
 
 type SoapEnvelope struct {
-	XMLName    xml.Name    `xml:"Envelope"`
-	SoapHeader *SoapHeader `xml:"Header,omitempty"`
-	SoapBody   *SoapBody   `xml:"Body"`
+	XMLName    xml.Name    `xml:"http://www.w3.org/2003/05/soap-envelop Envelope"`
+	SoapHeader *SoapHeader `xml:"http://www.w3.org/2003/05/soap-envelope Header,omitempty"`
+	SoapBody   *SoapBody   `xml:"http://www.w3.org/2003/05/soap-envelope Body"`
 }
 
 type SoapBody struct {
-	XMLName xml.Name    `xml:"Body"`
+	XMLName xml.Name    `xml:"http://www.w3.org/2003/05/soap-envelope Body"`
 	Content interface{} `xml:",omitempty"`
 	Fault   *SoapFault  `xml:",omitempty"`
 }
 
 type SoapHeader struct {
-	XMLName   xml.Name   `xml:"Header"`
-	Action    string     `xml:"Security"`
+	XMLName   xml.Name   `xml:"http://www.w3.org/2003/05/soap-envelope Header"`
+	Action    string     `xml:"Action"`
 	Security  *Security  `xml:"Security"`
 	Timestamp *Timestamp `xml:"Timestamp"`
 	Locale    string     `xml:"Locale"`
 }
 
 type SoapFault struct {
-	XMLName xml.Name `xml:"http://schemas.xmlsoap.org/soap/envelope/ Fault"`
+	XMLName xml.Name `xml:"http://www.w3.org/2003/05/soap-envelope Fault"`
 
 	Code   string `xml:"faultcode,omitempty"`
 	String string `xml:"faultstring,omitempty"`
@@ -40,15 +40,16 @@ type Security struct {
 
 type UsernameToken struct {
 	Username string `xml:"Username"`
-	Password string `xml:"Username"`
+	Password string `xml:"Password"`
 }
 
 type Timestamp struct {
-	Created time.Time `xml:"Created"`
-	Expires time.Time `xml:"Expires"`
+	Created *time.Time `xml:"Created"`
+	Expires *time.Time `xml:"Expires"`
 }
 
 type ScheduleGetEventsByTargetRequest struct {
+	XMLName    xml.Name    `xml:"ScheduleGetEventsByTarget"`
 	Parameters *Parameters `xml:"parameters"`
 }
 
@@ -64,7 +65,7 @@ type ScheduleGetEventsByTargetResponse struct {
 }
 
 type Returns struct {
-	XMLName        xml.Name        `xml:"returns"`
+	XMLName        xml.Name         `xml:"returns"`
 	ScheduleEvents []*ScheduleEvent `xml:"schedule_event"`
 }
 
@@ -100,21 +101,21 @@ type User struct {
 }
 
 type When struct {
-	XMLName  xml.Name `xml:"when"`
-	Datetime Datetime `xml:"datetime"`
-	Date     Date     `xml:"date"`
+	XMLName  xml.Name  `xml:"when"`
+	Datetime *Datetime `xml:"datetime"`
+	Date     *Date     `xml:"date"`
 }
 
 type Datetime struct {
-	XMLName xml.Name  `xml:"datetime"`
-	Start   time.Time `xml:"start,attr"`
-	End     time.Time `xml:"end,attr"`
+	XMLName xml.Name   `xml:"datetime"`
+	Start   *time.Time `xml:"start,attr"`
+	End     *time.Time `xml:"end,attr"`
 }
 
 type Date struct {
 	XMLName xml.Name `xml:"date"`
-	Start   xmlDate  `xml:"start,attr"`
-	End     xmlDate  `xml:"end,attr"`
+	Start   *xmlDate `xml:"start,attr"`
+	End     *xmlDate `xml:"end,attr"`
 }
 
 type xmlDate struct {

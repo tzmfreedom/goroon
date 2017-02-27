@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -47,7 +48,8 @@ func NewClient(username string, password string, endpoint string, debug bool, w 
 					Password: password,
 				},
 			},
-			Locale: "ja",
+			Locale:    "jp",
+			Timestamp: &Timestamp{},
 		},
 	}
 }
@@ -56,10 +58,19 @@ func (c *Client) SetHeader(header *SoapHeader) {
 	c.header = header
 }
 
-func (c *Client) Request(uri string, req interface{}, res interface{}) error {
+func (c *Client) Request(action string, uri string, req interface{}, res interface{}) error {
 	envelope := &SoapEnvelope{}
+	envelope.SoapHeader = c.header
+	envelope.SoapHeader.Action = action
+
+	created := time.Now()
+	envelope.SoapHeader.Timestamp.Created = &created
+	expires := created.Add(time.Duration(1) * time.Hour)
+	envelope.SoapHeader.Timestamp.Expires = &expires
+
 	envelope.SoapBody = &SoapBody{Content: req}
-	c.logger.Debug(xml.MarshalIndent(envelope, "", "	"))
+	b, err := xml.MarshalIndent(envelope, "", "	")
+	c.logger.Debug(string(b))
 	msg, err := xml.Marshal(envelope)
 	if err != nil {
 		return err
@@ -81,5 +92,5 @@ func (c *Client) Request(uri string, req interface{}, res interface{}) error {
 
 func (c *Client) ScheduleGetEventsByTarget(req *ScheduleGetEventsByTargetRequest, res *ScheduleGetEventsByTargetResponse) error {
 	uri := fmt.Sprintf("%s/cbpapi/schedule/api", c.endpoint)
-	return c.Request(uri, req, res)
+	return c.Request("ScheduleGetEventsByTarget", uri, req, res)
 }
