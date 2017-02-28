@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/k0kubun/pp"
 	"github.com/tzmfreedom/goroon"
 	"github.com/urfave/cli"
 )
@@ -64,7 +65,6 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				now := time.Now()
 				client := goroon.NewClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
 
 				start, err := time.Parse("2006-01-02 15:04:05", c.Start)
@@ -86,11 +86,12 @@ func main() {
 					},
 				}
 
-				err := client.ScheduleGetEventsByTarget(req, res)
+				err = client.ScheduleGetEventsByTarget(req, res)
 				if err != nil {
 					return err
 				}
 
+				pp.Print(res)
 				for _, event := range res.Returns.ScheduleEvents {
 					fmt.Println(strings.Join([]string{
 						fmt.Sprint(event.Id),

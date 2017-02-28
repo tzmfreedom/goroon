@@ -6,19 +6,18 @@ import (
 )
 
 type SoapEnvelope struct {
-	XMLName    xml.Name    `xml:"http://www.w3.org/2003/05/soap-envelop Envelope"`
+	XMLName    xml.Name    `xml:"http://www.w3.org/2003/05/soap-envelope Envelope"`
 	SoapHeader *SoapHeader `xml:"http://www.w3.org/2003/05/soap-envelope Header,omitempty"`
 	SoapBody   *SoapBody   `xml:"http://www.w3.org/2003/05/soap-envelope Body"`
 }
 
 type SoapBody struct {
-	XMLName xml.Name    `xml:"http://www.w3.org/2003/05/soap-envelope Body"`
+	XMLName xml.Name    `xml:"Body"`
 	Content interface{} `xml:",omitempty"`
 	Fault   *SoapFault  `xml:",omitempty"`
 }
 
 type SoapHeader struct {
-	XMLName   xml.Name   `xml:"http://www.w3.org/2003/05/soap-envelope Header"`
 	Action    string     `xml:"Action"`
 	Security  *Security  `xml:"Security"`
 	Timestamp *Timestamp `xml:"Timestamp"`
@@ -54,23 +53,21 @@ type ScheduleGetEventsByTargetRequest struct {
 }
 
 type Parameters struct {
-	Start time.Time `xml:"start,attr"`
-	End   time.Time `xml:"end,attr"`
-	User  *User     `xml:"user"`
+	Start *time.Time `xml:"start,attr"`
+	End   *time.Time `xml:"end,attr"`
+	User  *User      `xml:"user"`
 }
 
 type ScheduleGetEventsByTargetResponse struct {
 	XMLName xml.Name `xml:"ScheduleGetEventsByTargetResponse"`
-	Returns Returns  `xml:"returns"`
+	Returns *Returns `xml:"returns"`
 }
 
 type Returns struct {
-	XMLName        xml.Name         `xml:"returns"`
 	ScheduleEvents []*ScheduleEvent `xml:"schedule_event"`
 }
 
 type ScheduleEvent struct {
-	XMLName     xml.Name      `xml:"schedule_event"`
 	Members     []*Members    `xml:"members"`
 	RepeatInfo  []*RepeatInfo `xml:"repeat_info"`
 	When        *When         `xml:"when"`
@@ -86,12 +83,12 @@ type RepeatInfo struct {
 
 type Members struct {
 	XMLName xml.Name `xml:"members"`
-	Member  Member   `xml:"member`
+	Member  *Member  `xml:"member`
 }
 
 type Member struct {
 	XMLName xml.Name `xml:"member"`
-	User    User     `xml:"user"`
+	User    *User    `xml:"user"`
 }
 
 type User struct {
@@ -129,5 +126,55 @@ func (c *xmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
 		return err
 	}
 	*c = xmlDate{parse}
+	return nil
+}
+
+func (b *SoapBody) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	if b.Content == nil {
+		return xml.UnmarshalError("Content must be a pointer to a struct")
+	}
+
+	var (
+		token    xml.Token
+		err      error
+		consumed bool
+	)
+
+Loop:
+	for {
+		if token, err = d.Token(); err != nil {
+			return err
+		}
+
+		if token == nil {
+			break
+		}
+
+		switch se := token.(type) {
+		case xml.StartElement:
+			if consumed {
+				return xml.UnmarshalError("Found multiple elements inside SOAP body; not wrapped-document/literal WS-I compliant")
+			} else if se.Name.Space == "http://schemas.xmlsoap.org/soap/envelope/" && se.Name.Local == "Fault" {
+				b.Fault = &SoapFault{}
+				b.Content = nil
+
+				err = d.DecodeElement(b.Fault, &se)
+				if err != nil {
+					return err
+				}
+
+				consumed = true
+			} else {
+				if err = d.DecodeElement(b.Content, &se); err != nil {
+					return err
+				}
+
+				consumed = true
+			}
+		case xml.EndElement:
+			break Loop
+		}
+	}
+
 	return nil
 }

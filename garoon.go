@@ -85,8 +85,8 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 	body, _ := ioutil.ReadAll(resp.Body)
 
 	c.logger.Debug(bytes.NewBuffer(body).String())
-
-	err = xml.Unmarshal(body, res)
+	res_env := &SoapEnvelope{SoapBody: &SoapBody{Content: res}}
+	err = xml.Unmarshal(body, res_env)
 	return err
 }
 
