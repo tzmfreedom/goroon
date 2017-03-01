@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/k0kubun/pp"
 	"github.com/tzmfreedom/goroon"
 
 	"gopkg.in/h2non/gock.v1"
@@ -73,5 +72,4 @@ xmlns:schedule="http://wsdl.cybozu.co.jp/schedule/2008">
 		},
 	}
 	client.ScheduleGetEventsByTarget(req, res)
-	pp.Print(res)
 }

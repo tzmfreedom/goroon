@@ -90,7 +90,37 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 	return err
 }
 
-func (c *Client) ScheduleGetEventsByTarget(req *ScheduleGetEventsByTargetRequest, res *ScheduleGetEventsByTargetResponse) error {
+func (c *Client) ScheduleGetEventsByTarget(req *ScheduleGetEventsByTargetRequest) (*ScheduleGetEventsByTargetResponse, error) {
 	uri := fmt.Sprintf("%s/cbpapi/schedule/api", c.endpoint)
-	return c.Request("ScheduleGetEventsByTarget", uri, req, res)
+	res := &ScheduleGetEventsByTargetResponse{}
+	err := c.Request("ScheduleGetEventsByTarget", uri, req, res)
+	return res, err
+}
+
+func (c *Client) UtilGetLoginUserId(req *UtilGetLoginUserIdRequest) (*UtilGetLoginUserIdResponse, error) {
+	uri := fmt.Sprintf("%s/cbpapi/util/api", c.endpoint)
+	res := &UtilGetLoginUserIdResponse{}
+	err := c.Request("UtilGetLoginUserId", uri, req, res)
+	return res, err
+}
+
+func (c *Client) ScheduleGetEvents(req *ScheduleGetEventsRequest) (*ScheduleGetEventsResponse, error) {
+	uri := fmt.Sprintf("%s/cbpapi/schedule/api", c.endpoint)
+	res := &ScheduleGetEventsResponse{}
+	err := c.Request("ScheduleGetEvents", uri, req, res)
+	return res, err
+}
+
+func (c *Client) BaseGetUserByLoginName(req *BaseGetUserByLoginNameRequest) (*BaseGetUserByLoginNameResponse, error) {
+	uri := fmt.Sprintf("%s/cbpapi/base/api", c.endpoint)
+	res := &BaseGetUserByLoginNameResponse{}
+	err := c.Request("BaseGetUserByLoginName", uri, req, res)
+	return res, err
+}
+
+func (c *Client) BulletinGetFollows(req *BulletinGetFollowsRequest) (*BulletinGetFollowsResponse, error) {
+	uri := fmt.Sprintf("%s/cbpapi/bulletin/api", c.endpoint)
+	res := &BulletinGetFollowsResponse{}
+	err := c.Request("BulletinGetFollows", uri, req, res)
+	return res, err
 }

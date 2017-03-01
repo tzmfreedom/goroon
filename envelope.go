@@ -3,6 +3,8 @@ package goroon
 import (
 	"encoding/xml"
 	"time"
+
+	"github.com/k0kubun/pp"
 )
 
 type SoapEnvelope struct {
@@ -53,9 +55,13 @@ type ScheduleGetEventsByTargetRequest struct {
 }
 
 type Parameters struct {
-	Start *time.Time `xml:"start,attr"`
-	End   *time.Time `xml:"end,attr"`
-	User  *User      `xml:"user"`
+	Start     *time.Time `xml:"start,attr,omitempty"`
+	End       *time.Time `xml:"end,attr,omitempty"`
+	User      *User      `xml:"user,omitempty"`
+	LoginName []*string  `xml:"login_name,omitempty"`
+	TopicId   int        `xml:"topic_id"`
+	Offset    int        `xml:"offset"`
+	Limit     int        `xml:"limit"`
 }
 
 type ScheduleGetEventsByTargetResponse struct {
@@ -64,7 +70,25 @@ type ScheduleGetEventsByTargetResponse struct {
 }
 
 type Returns struct {
-	ScheduleEvents []*ScheduleEvent `xml:"schedule_event"`
+	ScheduleEvents []*ScheduleEvent `xml:"schedule_event,omitempty"`
+	Follow         *[]Follow        `xml:"follow, omitempty`
+	UserId         int              `xml:"user_id, omitempty"`
+	User           []*User          `xml:"user,omitempty"`
+}
+
+type Follow struct {
+	XMLName xml.Name `xml:"follow"`
+	Creator *Creator `xml:"http://schemas.cybozu.co.jp/bulletin/2008 creator"`
+	TopicId int      `xml:"topic_id"`
+	Id      int      `xml:"id"`
+	Number  int      `xml:"number"`
+	Text    string   `xml:"text"`
+}
+
+type Creator struct {
+	UserId int        `xml:"user_id"`
+	Name   string     `xml:"huy"`
+	Date   *time.Time `xml:"date"`
 }
 
 type ScheduleEvent struct {
@@ -92,9 +116,19 @@ type Member struct {
 }
 
 type User struct {
-	XMLName xml.Name `xml:"user"`
-	Id      string   `xml:"id,attr"`
-	Name    string   `xml:"name,attr"`
+	XMLName     xml.Name `xml:"user"`
+	Id          string   `xml:"id,attr"`
+	Name        string   `xml:"name,attr"`
+	Key         int      `xml:"key"`
+	Version     int      `xml:"version"`
+	Order       int      `xml:"order"`
+	LoginName   int      `xml:"login_name"`
+	Status      int      `xml:"status"`
+	URL         string   `xml:"url"`
+	Email       string   `xml:"email"`
+	Phone       string   `xml:"phone"`
+	Description string   `xml:"description"`
+	Title       string   `xml:"title"`
 }
 
 type When struct {
@@ -117,6 +151,46 @@ type Date struct {
 
 type xmlDate struct {
 	time.Time
+}
+
+type BaseGetUserByLoginNameRequest struct {
+	XMLName    xml.Name    `xml:"BaseGetUsersByLoginName"`
+	Parameters *Parameters `xml:"parameters"`
+}
+
+type BaseGetUserByLoginNameResponse struct {
+	XMLName xml.Name `xml:"BaseGetUserByLoginNameResponse"`
+	Returns *Returns `xml:"returns"`
+}
+
+type UtilGetLoginUserIdRequest struct {
+	XMLName    xml.Name    `xml:"UtilGetLoginUserIdRequest"`
+	Parameters *Parameters `xml:"parameters"`
+}
+
+type UtilGetLoginUserIdResponse struct {
+	XMLName xml.Name `xml:"UtilGetLoginUserIdResponse"`
+	Returns *Returns `xml:"returns"`
+}
+
+type ScheduleGetEventsRequest struct {
+	XMLName    xml.Name    `xml:"ScheduleGetEvents"`
+	Parameters *Parameters `xml:"parameters"`
+}
+
+type ScheduleGetEventsResponse struct {
+	XMLName xml.Name `xml:"ScheduleGetEventsResponse"`
+	Returns *Returns `xml:"returns"`
+}
+
+type BulletinGetFollowsRequest struct {
+	XMLName    xml.Name    `xml:"ScheduleGetEvents"`
+	Parameters *Parameters `xml:"parameters"`
+}
+
+type BulletinGetFollowsResponse struct {
+	XMLName xml.Name `xml:"BulletinGetFollowsResponse"`
+	Returns *Returns `xml:"returns"`
 }
 
 func (c *xmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
@@ -157,7 +231,6 @@ Loop:
 			} else if se.Name.Space == "http://schemas.xmlsoap.org/soap/envelope/" && se.Name.Local == "Fault" {
 				b.Fault = &SoapFault{}
 				b.Content = nil
-
 				err = d.DecodeElement(b.Fault, &se)
 				if err != nil {
 					return err
