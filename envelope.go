@@ -3,8 +3,6 @@ package goroon
 import (
 	"encoding/xml"
 	"time"
-
-	"github.com/k0kubun/pp"
 )
 
 type SoapEnvelope struct {
@@ -71,7 +69,7 @@ type ScheduleGetEventsByTargetResponse struct {
 
 type Returns struct {
 	ScheduleEvents []*ScheduleEvent `xml:"schedule_event,omitempty"`
-	Follow         *[]Follow        `xml:"follow, omitempty`
+	Follow         []*Follow        `xml:"follow, omitempty`
 	UserId         int              `xml:"user_id, omitempty"`
 	User           []*User          `xml:"user,omitempty"`
 }
@@ -117,7 +115,7 @@ type Member struct {
 
 type User struct {
 	XMLName     xml.Name `xml:"user"`
-	Id          string   `xml:"id,attr"`
+	Id          int      `xml:"id,attr"`
 	Name        string   `xml:"name,attr"`
 	Key         int      `xml:"key"`
 	Version     int      `xml:"version"`
