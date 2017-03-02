@@ -47,17 +47,14 @@ if err != nil {
   return err
 }
 
-req := &goroon.ScheduleGetEventsRequest{
-  Parameters: &goroon.Parameters{
-    Start: &start,
-    End:   &end,
-  },
-}
-res, err := client.ScheduleGetEvents(req)
+res, err := client.ScheduleGetEvents(&goroon.Parameters{
+  Start: start,
+  End:   end,
+})
 if err != nil {
   return err
 }
-for _, sch := range res.Returns.Schedule.ScheduleEvents {
+for _, sch := range res.ScheduleEvents {
   fmt.Println(event.Id)
   fmt.Println(event.Members)
   fmt.Println(event.EventType)
@@ -76,35 +73,28 @@ for _, sch := range res.Returns.Schedule.ScheduleEvents {
 Get UserId from login name
 
 ```golang
-req := &goroon.BaseGetUserByLoginNameRequest{
-  Parameters: &goroon.Parameters{
-    LoginName: []*string{"hogehoge"},
-  },
-}
-res, err := client.BaseGetUserByLoginName(req)
+res, err := client.BaseGetUserByLoginName(&goroon.Parameters{
+  LoginName: []string{"hogehoge"},
+})
 if err != nil {
   return err
 }
-fmt.Println(res.Returns.LoginId)
+fmt.Println(res.LoginId)
 ```
 
 Get Bulletin folows
 
 ```golang
-req := &goroon.BulletinGetFollowsRequest{
-  Parameters: &goroon.Parameters{
-    TopicId: 1234,
-    Offset:  0,
-    Limit:   20,
-  },
-}
-
-res, err := client.BulletinGetFollows(req)
+res, err := client.BulletinGetFollows(&goroon.Parameters{
+  TopicId: 1234,
+  Offset:  0,
+  Limit:   20,
+})
 if err != nil {
   return err
 }
 
-for _, follow := range res.Returns.Follow {
+for _, follow := range res.Follow {
   fmt.Println(fmt.Sprint(follow.Number)
   fmt.Println(follow.Creator.Name)
   fmt.Println(follow.Text)
