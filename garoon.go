@@ -38,14 +38,14 @@ func NewClient(username string, password string, endpoint string, debug bool, w 
 		endpoint: endpoint,
 		Debugger: newLogger(w, debug),
 		header: &SoapHeader{
-			Security: &Security{
-				UsernameToken: &UsernameToken{
+			Security: Security{
+				UsernameToken: UsernameToken{
 					Username: username,
 					Password: password,
 				},
 			},
 			Locale:    "jp",
-			Timestamp: &Timestamp{},
+			Timestamp: Timestamp{},
 		},
 	}
 }
@@ -60,9 +60,9 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 	envelope.SoapHeader.Action = action
 
 	created := time.Now()
-	envelope.SoapHeader.Timestamp.Created = &created
+	envelope.SoapHeader.Timestamp.Created = created
 	expires := created.Add(time.Duration(1) * time.Hour)
-	envelope.SoapHeader.Timestamp.Expires = &expires
+	envelope.SoapHeader.Timestamp.Expires = expires
 
 	envelope.SoapBody = &SoapBody{Content: req}
 	b, err := xml.MarshalIndent(envelope, "", "	")
@@ -86,37 +86,67 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 	return err
 }
 
-func (c *Client) ScheduleGetEventsByTarget(req *ScheduleGetEventsByTargetRequest) (*ScheduleGetEventsByTargetResponse, error) {
+func (c *Client) ScheduleGetEventsByTarget(params *Parameters) (*Returns, error) {
 	uri := fmt.Sprintf("%s/cbpapi/schedule/api", c.endpoint)
+	req := &ScheduleGetEventsByTargetRequest{
+		Parameters: params,
+	}
 	res := &ScheduleGetEventsByTargetResponse{}
 	err := c.Request("ScheduleGetEventsByTarget", uri, req, res)
-	return res, err
+	if err != nil {
+		return nil, err
+	}
+	return res.Returns, nil
 }
 
-func (c *Client) UtilGetLoginUserId(req *UtilGetLoginUserIdRequest) (*UtilGetLoginUserIdResponse, error) {
+func (c *Client) UtilGetLoginUserId(params *Parameters) (*Returns, error) {
 	uri := fmt.Sprintf("%s/cbpapi/util/api", c.endpoint)
+	req := &UtilGetLoginUserIdRequest{
+		Parameters: params,
+	}
 	res := &UtilGetLoginUserIdResponse{}
 	err := c.Request("UtilGetLoginUserId", uri, req, res)
-	return res, err
+	if err != nil {
+		return nil, err
+	}
+	return res.Returns, nil
 }
 
-func (c *Client) ScheduleGetEvents(req *ScheduleGetEventsRequest) (*ScheduleGetEventsResponse, error) {
+func (c *Client) ScheduleGetEvents(params *Parameters) (*Returns, error) {
 	uri := fmt.Sprintf("%s/cbpapi/schedule/api", c.endpoint)
+	req := &ScheduleGetEventsRequest{
+		Parameters: params,
+	}
 	res := &ScheduleGetEventsResponse{}
 	err := c.Request("ScheduleGetEvents", uri, req, res)
-	return res, err
+	if err != nil {
+		return nil, err
+	}
+	return res.Returns, nil
 }
 
-func (c *Client) BaseGetUserByLoginName(req *BaseGetUserByLoginNameRequest) (*BaseGetUserByLoginNameResponse, error) {
+func (c *Client) BaseGetUserByLoginName(params *Parameters) (*Returns, error) {
 	uri := fmt.Sprintf("%s/cbpapi/base/api", c.endpoint)
+	req := &BaseGetUserByLoginNameRequest{
+		Parameters: params,
+	}
 	res := &BaseGetUserByLoginNameResponse{}
 	err := c.Request("BaseGetUserByLoginName", uri, req, res)
-	return res, err
+	if err != nil {
+		return nil, err
+	}
+	return res.Returns, nil
 }
 
-func (c *Client) BulletinGetFollows(req *BulletinGetFollowsRequest) (*BulletinGetFollowsResponse, error) {
+func (c *Client) BulletinGetFollows(params *Parameters) (*Returns, error) {
 	uri := fmt.Sprintf("%s/cbpapi/bulletin/api", c.endpoint)
+	req := &BulletinGetFollowsRequest{
+		Parameters: params,
+	}
 	res := &BulletinGetFollowsResponse{}
 	err := c.Request("BulletinGetFollows", uri, req, res)
-	return res, err
+	if err != nil {
+		return nil, err
+	}
+	return res.Returns, nil
 }

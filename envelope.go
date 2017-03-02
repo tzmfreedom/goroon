@@ -19,8 +19,8 @@ type SoapBody struct {
 
 type SoapHeader struct {
 	Action    string     `xml:"Action"`
-	Security  *Security  `xml:"Security"`
-	Timestamp *Timestamp `xml:"Timestamp"`
+	Security  Security  `xml:"Security"`
+	Timestamp Timestamp `xml:"Timestamp"`
 	Locale    string     `xml:"Locale"`
 }
 
@@ -34,7 +34,7 @@ type SoapFault struct {
 }
 
 type Security struct {
-	UsernameToken *UsernameToken `xml:"UsernameToken,omitempty`
+	UsernameToken UsernameToken `xml:"UsernameToken,omitempty`
 }
 
 type UsernameToken struct {
@@ -43,8 +43,8 @@ type UsernameToken struct {
 }
 
 type Timestamp struct {
-	Created *time.Time `xml:"Created"`
-	Expires *time.Time `xml:"Expires"`
+	Created time.Time `xml:"Created"`
+	Expires time.Time `xml:"Expires"`
 }
 
 type ScheduleGetEventsByTargetRequest struct {
@@ -53,10 +53,10 @@ type ScheduleGetEventsByTargetRequest struct {
 }
 
 type Parameters struct {
-	Start     *time.Time `xml:"start,attr,omitempty"`
-	End       *time.Time `xml:"end,attr,omitempty"`
-	User      *User      `xml:"user,omitempty"`
-	LoginName []*string  `xml:"login_name,omitempty"`
+	Start     time.Time `xml:"start,attr,omitempty"`
+	End       time.Time `xml:"end,attr,omitempty"`
+	User      User      `xml:"user,omitempty"`
+	LoginName []string  `xml:"login_name,omitempty"`
 	TopicId   int        `xml:"topic_id,attr"`
 	Offset    int        `xml:"offset,attr"`
 	Limit     int        `xml:"limit,attr"`
@@ -68,10 +68,10 @@ type ScheduleGetEventsByTargetResponse struct {
 }
 
 type Returns struct {
-	ScheduleEvents []*ScheduleEvent `xml:"schedule_event,omitempty"`
-	Follow         []*Follow        `xml:"follow, omitempty`
+	ScheduleEvents []ScheduleEvent `xml:"schedule_event,omitempty"`
+	Follow         []Follow        `xml:"follow, omitempty`
 	UserId         int              `xml:"user_id, omitempty"`
-	User           []*User          `xml:"user,omitempty"`
+	User           []User          `xml:"user,omitempty"`
 }
 
 type Follow struct {
@@ -86,13 +86,13 @@ type Follow struct {
 type Creator struct {
 	UserId int        `xml:"user_id"`
 	Name   string     `xml:"huy"`
-	Date   *time.Time `xml:"date"`
+	Date   time.Time `xml:"date"`
 }
 
 type ScheduleEvent struct {
-	Members     []*Members    `xml:"members"`
-	RepeatInfo  []*RepeatInfo `xml:"repeat_info"`
-	When        *When         `xml:"when"`
+	Members     []Members    `xml:"members"`
+	RepeatInfo  []RepeatInfo `xml:"repeat_info"`
+	When        When         `xml:"when"`
 	Detail      string        `xml:"detail,attr"`
 	Description string        `xml:"description,attr"`
 	Id          int           `xml:"id,attr"`
@@ -105,12 +105,12 @@ type RepeatInfo struct {
 
 type Members struct {
 	XMLName xml.Name `xml:"members"`
-	Member  *Member  `xml:"member`
+	Member  Member  `xml:"member`
 }
 
 type Member struct {
 	XMLName xml.Name `xml:"member"`
-	User    *User    `xml:"user"`
+	User    User    `xml:"user"`
 }
 
 type User struct {
@@ -131,20 +131,20 @@ type User struct {
 
 type When struct {
 	XMLName  xml.Name  `xml:"when"`
-	Datetime *Datetime `xml:"datetime"`
-	Date     *Date     `xml:"date"`
+	Datetime Datetime `xml:"datetime"`
+	Date     Date     `xml:"date"`
 }
 
 type Datetime struct {
 	XMLName xml.Name   `xml:"datetime"`
-	Start   *time.Time `xml:"start,attr"`
-	End     *time.Time `xml:"end,attr"`
+	Start   time.Time `xml:"start,attr"`
+	End     time.Time `xml:"end,attr"`
 }
 
 type Date struct {
 	XMLName xml.Name `xml:"date"`
-	Start   *xmlDate `xml:"start,attr"`
-	End     *xmlDate `xml:"end,attr"`
+	Start   xmlDate `xml:"start,attr"`
+	End     xmlDate `xml:"end,attr"`
 }
 
 type xmlDate struct {

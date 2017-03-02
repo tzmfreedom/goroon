@@ -81,42 +81,30 @@ func main() {
 
 				var returns *goroon.Returns
 				if c.UserId != "" {
-					name_req := &goroon.BaseGetUserByLoginNameRequest{
-						Parameters: &goroon.Parameters{
-							LoginName: []*string{&c.UserId},
-						},
-					}
-					name_res, err := client.BaseGetUserByLoginName(name_req)
+					res, err := client.BaseGetUserByLoginName(&goroon.Parameters{
+						LoginName: []string{c.UserId},
+					})
 					if err != nil {
 						return err
 					}
-					sch_req := &goroon.ScheduleGetEventsByTargetRequest{
-						Parameters: &goroon.Parameters{
-							Start: &start,
-							End:   &end,
-							User: &goroon.User{
-								Id: name_res.Returns.UserId,
-							},
+					returns, err = client.ScheduleGetEventsByTarget(&goroon.Parameters{
+						Start: start,
+						End:   end,
+						User: goroon.User{
+							Id: res.UserId,
 						},
-					}
-
-					sch_res, err := client.ScheduleGetEventsByTarget(sch_req)
+					})
 					if err != nil {
 						return err
 					}
-					returns = sch_res.Returns
 				} else {
-					req := &goroon.ScheduleGetEventsRequest{
-						Parameters: &goroon.Parameters{
-							Start: &start,
-							End:   &end,
-						},
-					}
-					res, err := client.ScheduleGetEvents(req)
+					returns, err = client.ScheduleGetEvents(&goroon.Parameters{
+						Start: start,
+						End:   end,
+					})
 					if err != nil {
 						return err
 					}
-					returns = res.Returns
 				}
 
 				for _, event := range returns.ScheduleEvents {
@@ -126,8 +114,8 @@ func main() {
 						event.EventType,
 						strings.Replace(event.Detail, "\n", "", -1),
 						strings.Replace(event.Description, "\n", "", -1),
-						startStr(event),
-						endStr(event),
+						startStr(&event),
+						endStr(&event),
 					}, "\t"))
 				}
 				return nil
@@ -172,21 +160,16 @@ func main() {
 			},
 			Action: func(ctx *cli.Context) error {
 				client := goroon.NewClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
-
-				req := &goroon.BulletinGetFollowsRequest{
-					Parameters: &goroon.Parameters{
-						TopicId: c.TopicId,
-						Offset:  c.Offset,
-						Limit:   c.Limit,
-					},
-				}
-
-				res, err := client.BulletinGetFollows(req)
+				res, err := client.BulletinGetFollows(&goroon.Parameters{
+					TopicId: c.TopicId,
+					Offset:  c.Offset,
+					Limit:   c.Limit,
+				})
 				if err != nil {
 					return err
 				}
 
-				for _, follow := range res.Returns.Follow {
+				for _, follow := range res.Follow {
 					fmt.Println(strings.Join([]string{
 						fmt.Sprint(follow.Number),
 						follow.Creator.Name,
