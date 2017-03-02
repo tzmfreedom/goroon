@@ -26,21 +26,17 @@ type Client struct {
 	password string
 	endpoint string
 	header   *SoapHeader
-	logger   *logrus.Logger
+	Debugger Debugger
 }
 
-var Debug = func(args ...interface{}) {
-
+type Debugger interface {
+	Debug(args ...interface{})
 }
 
 func NewClient(username string, password string, endpoint string, debug bool, w io.Writer) *Client {
-	logger := newLogger(w, debug)
-	if debug {
-		Debug = logger.Debug
-	}
 	return &Client{
 		endpoint: endpoint,
-		logger:   newLogger(w, debug),
+		Debugger: newLogger(w, debug),
 		header: &SoapHeader{
 			Security: &Security{
 				UsernameToken: &UsernameToken{
@@ -70,7 +66,7 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 
 	envelope.SoapBody = &SoapBody{Content: req}
 	b, err := xml.MarshalIndent(envelope, "", "	")
-	c.logger.Debug(string(b))
+	c.Debugger.Debug(string(b))
 	msg, err := xml.Marshal(envelope)
 	if err != nil {
 		return err
@@ -84,7 +80,7 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	c.logger.Debug(bytes.NewBuffer(body).String())
+	c.Debugger.Debug(bytes.NewBuffer(body).String())
 	res_env := &SoapEnvelope{SoapBody: &SoapBody{Content: res}}
 	err = xml.Unmarshal(body, res_env)
 	return err
