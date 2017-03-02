@@ -57,9 +57,9 @@ type Parameters struct {
 	End       *time.Time `xml:"end,attr,omitempty"`
 	User      *User      `xml:"user,omitempty"`
 	LoginName []*string  `xml:"login_name,omitempty"`
-	TopicId   int        `xml:"topic_id"`
-	Offset    int        `xml:"offset"`
-	Limit     int        `xml:"limit"`
+	TopicId   int        `xml:"topic_id,attr"`
+	Offset    int        `xml:"offset,attr"`
+	Limit     int        `xml:"limit,attr"`
 }
 
 type ScheduleGetEventsByTargetResponse struct {
@@ -162,7 +162,7 @@ type BaseGetUserByLoginNameResponse struct {
 }
 
 type UtilGetLoginUserIdRequest struct {
-	XMLName    xml.Name    `xml:"UtilGetLoginUserIdRequest"`
+	XMLName    xml.Name    `xml:"UtilGetLoginUserId"`
 	Parameters *Parameters `xml:"parameters"`
 }
 
@@ -182,7 +182,7 @@ type ScheduleGetEventsResponse struct {
 }
 
 type BulletinGetFollowsRequest struct {
-	XMLName    xml.Name    `xml:"ScheduleGetEvents"`
+	XMLName    xml.Name    `xml:"BulletinGetFollows"`
 	Parameters *Parameters `xml:"parameters"`
 }
 
