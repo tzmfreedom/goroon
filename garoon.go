@@ -11,8 +11,6 @@ import (
 )
 
 type Client struct {
-	username string
-	password string
 	endpoint string
 	header   *SoapHeader
 	Debugger io.Writer
