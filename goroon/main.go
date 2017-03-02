@@ -14,7 +14,7 @@ type config struct {
 	Username string
 	Password string
 	Endpoint string
-	Userid   int
+	UserId   string
 	Debug    bool
 	Start    string
 	End      string
@@ -49,9 +49,9 @@ func main() {
 					Destination: &c.Endpoint,
 					EnvVar:      "GAROON_ENDPOINT",
 				},
-				cli.IntFlag{
+				cli.StringFlag{
 					Name:        "userid, i",
-					Destination: &c.Userid,
+					Destination: &c.UserId,
 				},
 				cli.BoolFlag{
 					Name:        "debug, d",
@@ -68,6 +68,7 @@ func main() {
 			},
 			Action: func(ctx *cli.Context) error {
 				client := goroon.NewClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
+
 				loc, _ := time.LoadLocation("Asia/Tokyo")
 				start, err := time.ParseInLocation("2006-01-02 15:04:05", c.Start, loc)
 				if err != nil {
@@ -79,22 +80,31 @@ func main() {
 				}
 
 				var returns *goroon.Returns
-				if c.Userid != 0 {
-					req := &goroon.ScheduleGetEventsByTargetRequest{
+				if c.UserId != "" {
+					name_req := &goroon.BaseGetUserByLoginNameRequest{
+						Parameters: &goroon.Parameters{
+							LoginName: []*string{&c.UserId},
+						},
+					}
+					name_res, err := client.BaseGetUserByLoginName(name_req)
+					if err != nil {
+						return err
+					}
+					sch_req := &goroon.ScheduleGetEventsByTargetRequest{
 						Parameters: &goroon.Parameters{
 							Start: &start,
 							End:   &end,
 							User: &goroon.User{
-								Id: c.Userid,
+								Id: name_res.Returns.UserId,
 							},
 						},
 					}
 
-					res, err := client.ScheduleGetEventsByTarget(req)
+					sch_res, err := client.ScheduleGetEventsByTarget(sch_req)
 					if err != nil {
 						return err
 					}
-					returns = res.Returns
+					returns = sch_res.Returns
 				} else {
 					req := &goroon.ScheduleGetEventsRequest{
 						Parameters: &goroon.Parameters{
