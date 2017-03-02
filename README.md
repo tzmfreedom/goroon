@@ -63,8 +63,6 @@ for _, sch := range res.Returns.Schedule.ScheduleEvents {
   fmt.Println(event.EventType)
   fmt.Println(event.Detail)
   fmt.Println(event.Description)
-  fmt.event)
-  ndStr(event),
   if event.EventType == "banner" {
     event.When.Date.Start.Format("2006-01-02")
     event.When.Date.End.Format("2006-01-02")
@@ -77,7 +75,7 @@ for _, sch := range res.Returns.Schedule.ScheduleEvents {
 
 Get UserId from login name
 
-```
+```golang
 req := &goroon.BaseGetUserByLoginNameRequest{
   Parameters: &goroon.Parameters{
     LoginName: []*string{"hogehoge"},
@@ -92,7 +90,7 @@ fmt.Println(res.Returns.LoginId)
 
 Get Bulletin folows
 
-```
+```golang
 req := &goroon.BulletinGetFollowsRequest{
   Parameters: &goroon.Parameters{
     TopicId: 1234,
