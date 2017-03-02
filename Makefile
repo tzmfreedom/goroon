@@ -1,6 +1,6 @@
 .PHONY: test install uninstall
 
-test: 
+test: build
 	@go test -v ./...
 
 install: build
