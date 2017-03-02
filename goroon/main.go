@@ -67,7 +67,7 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := goroon.NewClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
+				client := goroon.NewClient(c.Username, c.Password, c.Endpoint)
 
 				loc, _ := time.LoadLocation("Asia/Tokyo")
 				start, err := time.ParseInLocation("2006-01-02 15:04:05", c.Start, loc)
@@ -159,7 +159,7 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := goroon.NewClient(c.Username, c.Password, c.Endpoint, c.Debug, os.Stdout)
+				client := goroon.NewClient(c.Username, c.Password, c.Endpoint)
 				res, err := client.BulletinGetFollows(&goroon.Parameters{
 					TopicId: c.TopicId,
 					Offset:  c.Offset,

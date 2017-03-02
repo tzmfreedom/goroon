@@ -8,35 +8,26 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
-
-	"github.com/Sirupsen/logrus"
 )
-
-func newLogger(outStream io.Writer, debug bool) *logrus.Logger {
-	l := logrus.New()
-	l.Out = outStream
-	if debug {
-		l.Level = logrus.DebugLevel
-	}
-	return l
-}
 
 type Client struct {
 	username string
 	password string
 	endpoint string
 	header   *SoapHeader
-	Debugger Debugger
+	Debugger io.Writer
 }
 
-type Debugger interface {
-	Debug(args ...interface{})
+type NopWriter struct{}
+
+func (d *NopWriter) Write(b []byte) (int, error) {
+	return 0, nil
 }
 
-func NewClient(username string, password string, endpoint string, debug bool, w io.Writer) *Client {
+func NewClient(username string, password string, endpoint string) *Client {
 	return &Client{
 		endpoint: endpoint,
-		Debugger: newLogger(w, debug),
+		Debugger: &NopWriter{},
 		header: &SoapHeader{
 			Security: Security{
 				UsernameToken: UsernameToken{
@@ -66,7 +57,7 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 
 	envelope.SoapBody = &SoapBody{Content: req}
 	b, err := xml.MarshalIndent(envelope, "", "	")
-	c.Debugger.Debug(string(b))
+	c.Debugger.Write(b)
 	msg, err := xml.Marshal(envelope)
 	if err != nil {
 		return err
@@ -80,7 +71,7 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	c.Debugger.Debug(bytes.NewBuffer(body).String())
+	c.Debugger.Write(body)
 	res_env := &SoapEnvelope{SoapBody: &SoapBody{Content: res}}
 	err = xml.Unmarshal(body, res_env)
 	return err
