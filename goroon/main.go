@@ -68,7 +68,9 @@ func main() {
 			},
 			Action: func(ctx *cli.Context) error {
 				client := goroon.NewClient(c.Username, c.Password, c.Endpoint)
-
+				if c.Debug {
+					client.Debugger = os.Stdout
+				}
 				loc, _ := time.LoadLocation("Asia/Tokyo")
 				start, err := time.ParseInLocation("2006-01-02 15:04:05", c.Start, loc)
 				if err != nil {
