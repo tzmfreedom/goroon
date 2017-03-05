@@ -114,19 +114,19 @@ type Member struct {
 }
 
 type User struct {
-	XMLName     xml.Name `xml:"user"`
-	Id          int      `xml:"id,attr"`
-	Name        string   `xml:"name,attr"`
-	Key         int      `xml:"key"`
-	Version     int      `xml:"version"`
-	Order       int      `xml:"order"`
-	LoginName   int      `xml:"login_name"`
-	Status      int      `xml:"status"`
-	URL         string   `xml:"url"`
-	Email       string   `xml:"email"`
-	Phone       string   `xml:"phone"`
-	Description string   `xml:"description"`
-	Title       string   `xml:"title"`
+	XMLName     xml.Name `xml:"user,omitempty"`
+	Id          int      `xml:"id,attr,omitempty"`
+	Name        string   `xml:"name,attr,omitempty"`
+	Key         int      `xml:"key,omitempty"`
+	Version     int      `xml:"version,omitempty"`
+	Order       int      `xml:"order,omitempty"`
+	LoginName   int      `xml:"login_name,omitempty"`
+	Status      int      `xml:"status,omitempty"`
+	URL         string   `xml:"url,omitempty"`
+	Email       string   `xml:"email,omitempty"`
+	Phone       string   `xml:"phone,omitempty"`
+	Description string   `xml:"description,omitempty"`
+	Title       string   `xml:"title,omitempty"`
 }
 
 type When struct {
