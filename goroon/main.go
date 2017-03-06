@@ -112,7 +112,7 @@ func main() {
 				for _, event := range returns.ScheduleEvents {
 					fmt.Println(strings.Join([]string{
 						fmt.Sprint(event.Id),
-						fmt.Sprint(event.Members),
+						members2str(&event.Members),
 						event.EventType,
 						strings.Replace(event.Detail, "\n", "", -1),
 						strings.Replace(event.Description, "\n", "", -1),
@@ -197,4 +197,12 @@ func endStr(event *goroon.ScheduleEvent) string {
 		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
 	}
 	return event.When.Datetime.End.Format("2006-01-02T15:04:05")
+}
+
+func members2str(members *goroon.Members) string {
+	ret := []string{}
+	for _, m := range members.Member {
+		ret = append(ret, m.User.Name)
+	}
+	return strings.Join(ret, ":")
 }
