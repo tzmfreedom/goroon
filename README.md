@@ -32,20 +32,14 @@ $ goroon schedule -u hoge -p fuga -e https//hoge.garoon.com/grn.exe \
 
 Initialize
 ```
-client := goroon.NewClient("username", "password", "https://garoon.hogehoge.com/grn.exe", false, os.Stdout)
+client := goroon.NewClient("username", "password", "https://garoon.hogehoge.com/grn.exe")
 ```
 
 Get my schedule on target date
 
 ```golang
 start, err := time.Parse("2006-01-02 15:04:05", "2017-03-01 00:00:00")
-if err != nil {
-  return err
-}
 end, err := time.Parse("2006-01-02 15:04:05","2017-03-02 00:00:00")
-if err != nil {
-  return err
-}
 
 res, err := client.ScheduleGetEvents(&goroon.Parameters{
   Start: start,
