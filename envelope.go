@@ -90,7 +90,7 @@ type Creator struct {
 }
 
 type ScheduleEvent struct {
-	Members     Members    `xml:"members"`
+	Members     Members      `xml:"members"`
 	RepeatInfo  []RepeatInfo `xml:"repeat_info"`
 	When        When         `xml:"when"`
 	Detail      string       `xml:"detail,attr"`
@@ -105,7 +105,7 @@ type RepeatInfo struct {
 
 type Members struct {
 	XMLName xml.Name `xml:"members"`
-	Member  []Member   `xml:"member`
+	Member  []Member `xml:"member"`
 }
 
 type Member struct {
