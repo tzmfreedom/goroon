@@ -4,7 +4,7 @@ test: build
 	@go test -v ./...
 
 install: build
-	@go install
+	@go install ./goroon
 
 uninstall:
 
@@ -14,5 +14,4 @@ clean:
 build: clean
 	@goimports -w .
 	@gofmt -w .
-	@go build .
-
+	@go build -o cmd goroon
