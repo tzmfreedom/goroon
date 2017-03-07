@@ -2,6 +2,7 @@ package goroon
 
 import (
 	"encoding/xml"
+	"fmt"
 	"time"
 )
 
@@ -53,13 +54,13 @@ type ScheduleGetEventsByTargetRequest struct {
 }
 
 type Parameters struct {
-	Start     time.Time `xml:"start,attr,omitempty"`
-	End       time.Time `xml:"end,attr,omitempty"`
-	User      User      `xml:"user,omitempty"`
-	LoginName []string  `xml:"login_name,omitempty"`
-	TopicId   int       `xml:"topic_id,attr"`
-	Offset    int       `xml:"offset,attr"`
-	Limit     int       `xml:"limit,attr"`
+	Start     XmlDateTime `xml:"start,attr,omitempty"`
+	End       XmlDateTime `xml:"end,attr,omitempty"`
+	User      User        `xml:"user,omitempty"`
+	LoginName []string    `xml:"login_name,omitempty"`
+	TopicId   int         `xml:"topic_id,attr"`
+	Offset    int         `xml:"offset,attr"`
+	Limit     int         `xml:"limit,attr"`
 }
 
 type ScheduleGetEventsByTargetResponse struct {
@@ -143,11 +144,15 @@ type Datetime struct {
 
 type Date struct {
 	XMLName xml.Name `xml:"date"`
-	Start   xmlDate  `xml:"start,attr"`
-	End     xmlDate  `xml:"end,attr"`
+	Start   XmlDate  `xml:"start,attr"`
+	End     XmlDate  `xml:"end,attr"`
 }
 
-type xmlDate struct {
+type XmlDate struct {
+	time.Time
+}
+
+type XmlDateTime struct {
 	time.Time
 }
 
@@ -191,13 +196,20 @@ type BulletinGetFollowsResponse struct {
 	Returns *Returns `xml:"returns"`
 }
 
-func (c *xmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
+func (c *XmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
 	const shortForm = "2006-01-02"
 	parse, err := time.Parse(shortForm, attr.Value)
 	if err != nil {
 		return err
 	}
-	*c = xmlDate{parse}
+	fmt.Println(parse)
+	*c = XmlDate{parse}
+	return nil
+}
+
+func (c XmlDateTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	dateString := fmt.Sprintf("%vZ", c.Format("2006-01-02T15:04:05"))
+	e.EncodeElement(dateString, start)
 	return nil
 }
 

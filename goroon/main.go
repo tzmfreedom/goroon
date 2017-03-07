@@ -77,12 +77,11 @@ func main() {
 				if c.Debug {
 					client.Debugger = os.Stdout
 				}
-				loc, _ := time.LoadLocation("Asia/Tokyo")
-				start, err := time.ParseInLocation("2006-01-02 15:04:05", c.Start, loc)
+				start, err := time.ParseInLocation("2006-01-02 15:04:05", c.Start, time.Local)
 				if err != nil {
 					return err
 				}
-				end, err := time.ParseInLocation("2006-01-02 15:04:05", c.End, loc)
+				end, err := time.ParseInLocation("2006-01-02 15:04:05", c.End, time.Local)
 				if err != nil {
 					return err
 				}
@@ -96,8 +95,8 @@ func main() {
 						return err
 					}
 					returns, err = client.ScheduleGetEventsByTarget(&goroon.Parameters{
-						Start: start,
-						End:   end,
+						Start: goroon.XmlDateTime{start.In(time.UTC)},
+						End:   goroon.XmlDateTime{end.In(time.UTC)},
 						User: goroon.User{
 							Id: res.UserId,
 						},
@@ -107,8 +106,8 @@ func main() {
 					}
 				} else {
 					returns, err = client.ScheduleGetEvents(&goroon.Parameters{
-						Start: start,
-						End:   end,
+						Start: goroon.XmlDateTime{start.In(time.UTC)},
+						End:   goroon.XmlDateTime{end.In(time.UTC)},
 					})
 					if err != nil {
 						return err
