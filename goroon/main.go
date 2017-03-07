@@ -21,6 +21,7 @@ type config struct {
 	TopicId  int
 	Offset   int
 	Limit    int
+	Type     string
 }
 
 func main() {
@@ -64,6 +65,11 @@ func main() {
 				cli.StringFlag{
 					Name:        "end",
 					Destination: &c.End,
+				},
+				cli.StringFlag{
+					Name:        "type",
+					Destination: &c.Type,
+					Value:       "all",
 				},
 			},
 			Action: func(ctx *cli.Context) error {
@@ -110,6 +116,9 @@ func main() {
 				}
 
 				for _, event := range returns.ScheduleEvents {
+					if c.Type != "all" && event.EventType != c.Type {
+						continue
+					}
 					fmt.Println(strings.Join([]string{
 						fmt.Sprint(event.Id),
 						members2str(&event.Members),
