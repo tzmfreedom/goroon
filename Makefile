@@ -12,6 +12,6 @@ clean:
 	@go clean
 
 build: clean
-	@goimports -w .
+	-@goimports -w .
 	@gofmt -w .
 	@go build -o cmd ./goroon
