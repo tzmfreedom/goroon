@@ -202,7 +202,6 @@ func (c *XmlDate) UnmarshalXMLAttr(attr xml.Attr) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(parse)
 	*c = XmlDate{parse}
 	return nil
 }
