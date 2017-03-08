@@ -18,14 +18,79 @@ $ go get github.com/tzmfreedom/goroon
 
 ## Usage
 
-Get my schedule on target date
+```
+NAME:
+   goroon - garoon utility
 
+USAGE:
+   goroon [global options] command [command options] [arguments...]
+
+VERSION:
+   0.0.0
+
+COMMANDS:
+     schedule, s  get today's your schedule
+     bulletin, b  get bulletin
+     help, h      Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h     show help
+   --version, -v  print the version
+```
+
+Get schedule on target date
+```
+NAME:
+   goroon schedule - get today's your schedule
+
+USAGE:
+   goroon schedule [command options] [arguments...]
+
+OPTIONS:
+   --username value, -u value   [$GAROON_USERNAME]
+   --password value, -p value   [$GAROON_PASSWORD]
+   --endpoint value, -e value   [$GAROON_ENDPOINT]
+   --userid value, -i value
+   --debug, -d
+   --start value
+   --end value
+   --type value                (default: "all")
+```
+
+Get my schedule on target date
 ```bash
 $ goroon schedule -u {USERNAME} -p {PASSWORD} -e {ENDPOINT} --start {START DATETIME} --end {END DATETIME}
 
 ex)
 $ goroon schedule -u hoge -p fuga -e https//hoge.garoon.com/grn.exe \
   --start '2017-03-01 00:00:00' --end '2017-03-02 00:00:00'
+```
+
+Get target user's schedule
+```bash
+$ goroon schedule -u {USERNAME} -p {PASSWORD} -e {ENDPOINT} --start {START DATETIME} --end {END DATETIME} --userid {USER ID}
+```
+
+Get bulletin
+```
+NAME:
+   goroon bulletin - get bulletin
+
+USAGE:
+   goroon bulletin [command options] [arguments...]
+
+OPTIONS:
+   --username value, -u value   [$GAROON_USERNAME]
+   --password value, -p value   [$GAROON_PASSWORD]
+   --endpoint value, -e value   [$GAROON_ENDPOINT]
+   --topic_id value            (default: 0)
+   --debug, -d
+   --offset value, -o value    (default: 0)
+   --limit value, -l value     (default: 0)
+```
+
+```bash
+$ goroon bulleting -u {USERNAME} -p {PASSWORD} -e {ENDPOINT}
 ```
 
 ### Library
@@ -42,8 +107,8 @@ start, err := time.Parse("2006-01-02 15:04:05", "2017-03-01 00:00:00")
 end, err := time.Parse("2006-01-02 15:04:05","2017-03-02 00:00:00")
 
 res, err := client.ScheduleGetEvents(&goroon.Parameters{
-  Start: start,
-  End:   end,
+  Start: goroon.XmlDateTime{start},
+  End:   goroon.XmlDateTime{end},
 })
 if err != nil {
   return err
@@ -89,8 +154,14 @@ if err != nil {
 }
 
 for _, follow := range res.Follow {
-  fmt.Println(fmt.Sprint(follow.Number)
+  fmt.Println(fmt.Sprint(follow.Number))
   fmt.Println(follow.Creator.Name)
   fmt.Println(follow.Text)
 }
+```
+
+Debug your request
+```
+client := goroon.NewClient("username", "password", "https://garoon.hogehoge.com/grn.exe")
+client.Debugger = os.Stdout
 ```

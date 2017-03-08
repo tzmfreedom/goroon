@@ -10,6 +10,10 @@ import (
 	"github.com/urfave/cli"
 )
 
+const (
+	VERSION = "0.1.0"
+)
+
 type config struct {
 	Username string
 	Password string
@@ -29,6 +33,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "goroon"
 	app.Usage = "garoon utility"
+	app.Version = VERSION
 	app.Commands = []cli.Command{
 		{
 			Name:    "schedule",
@@ -54,10 +59,6 @@ func main() {
 					Name:        "userid, i",
 					Destination: &c.UserId,
 				},
-				cli.BoolFlag{
-					Name:        "debug, d",
-					Destination: &c.Debug,
-				},
 				cli.StringFlag{
 					Name:        "start",
 					Destination: &c.Start,
@@ -67,9 +68,13 @@ func main() {
 					Destination: &c.End,
 				},
 				cli.StringFlag{
-					Name:        "type",
+					Name:        "type, t",
 					Destination: &c.Type,
 					Value:       "all",
+				},
+				cli.BoolFlag{
+					Name:        "debug, d",
+					Destination: &c.Debug,
 				},
 			},
 			Action: func(ctx *cli.Context) error {
@@ -155,10 +160,6 @@ func main() {
 					Name:        "topic_id",
 					Destination: &c.TopicId,
 				},
-				cli.BoolFlag{
-					Name:        "debug, d",
-					Destination: &c.Debug,
-				},
 				cli.IntFlag{
 					Name:        "offset, o",
 					Destination: &c.Offset,
@@ -166,6 +167,11 @@ func main() {
 				cli.IntFlag{
 					Name:        "limit, l",
 					Destination: &c.Limit,
+					Value:       20,
+				},
+				cli.BoolFlag{
+					Name:        "debug, d",
+					Destination: &c.Debug,
 				},
 			},
 			Action: func(ctx *cli.Context) error {
