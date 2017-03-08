@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/tzmfreedom/goroon.svg?branch=master)](https://travis-ci.org/tzmfreedom/goroon)
+
 # Goroon
 
 Command Line Interface for Garoon with Go language
