@@ -70,7 +70,7 @@ type ScheduleGetEventsByTargetResponse struct {
 
 type Returns struct {
 	ScheduleEvents []ScheduleEvent `xml:"schedule_event,omitempty"`
-	Follow         []Follow        `xml:"follow, omitempty`
+	Follow         []Follow        `xml:"follow,omitempty"`
 	UserId         int             `xml:"user_id, omitempty"`
 	User           []User          `xml:"user,omitempty"`
 }
@@ -118,16 +118,16 @@ type User struct {
 	XMLName     xml.Name `xml:"user,omitempty"`
 	Id          int      `xml:"id,attr,omitempty"`
 	Name        string   `xml:"name,attr,omitempty"`
-	Key         int      `xml:"key,omitempty"`
-	Version     int      `xml:"version,omitempty"`
-	Order       int      `xml:"order,omitempty"`
-	LoginName   int      `xml:"login_name,omitempty"`
-	Status      int      `xml:"status,omitempty"`
-	URL         string   `xml:"url,omitempty"`
-	Email       string   `xml:"email,omitempty"`
-	Phone       string   `xml:"phone,omitempty"`
-	Description string   `xml:"description,omitempty"`
-	Title       string   `xml:"title,omitempty"`
+	Key         int      `xml:"key,attr,omitempty"`
+	Version     int      `xml:"version,attr,omitempty"`
+	Order       int      `xml:"order,attr,omitempty"`
+	LoginName   string   `xml:"login_name,attr,omitempty"`
+	Status      int      `xml:"status,attr,omitempty"`
+	URL         string   `xml:"url,attr,omitempty"`
+	Email       string   `xml:"email,attr,omitempty"`
+	Phone       string   `xml:"phone,attr,omitempty"`
+	Description string   `xml:"description,attr,omitempty"`
+	Title       string   `xml:"title,attr,omitempty"`
 }
 
 type When struct {

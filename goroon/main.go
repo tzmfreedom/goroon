@@ -38,7 +38,7 @@ func main() {
 		{
 			Name:    "schedule",
 			Aliases: []string{"s"},
-			Usage:   "get today's your schedule",
+			Usage:   "get your schedule",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:        "username, u",

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope
+        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:schedule="http://wsdl.cybozu.co.jp/schedule/2008">
+    <soap:Header>
+        <vendor>Cybozu</vendor>
+        <product>Garoon</product>
+        <product_type>1</product_type>
+        <version>3.7.5</version>
+        <apiversion>1.3.1</apiversion>
+    </soap:Header>
+    <soap:Body>
+        <schedule:BulletinGetFollowsResponse>
+            <returns>
+                <follow topic_id="2" id="15" number="4" text="follow 4"
+                        xmlns:flw="http://schemas.cybozu.co.jp/bulletin/2008">
+                    <flw:creator user_id="3" name="huy" date="2010-11-04T21:12:42Z" />
+                </follow>
+                <follow topic_id="2" id="14" number="3" text="follow 3"
+                        xmlns:flw="http://schemas.cybozu.co.jp/bulletin/2008">
+                    <flw:creator user_id="3" name="huy" date="2010-11-04T21:12:31Z" />
+                </follow>
+                <follow topic_id="2" id="13" number="2" text="follow 2"
+                        xmlns:flw="http://schemas.cybozu.co.jp/bulletin/2008">
+                    <flw:creator user_id="3" name="huy" date="2010-11-04T21:12:21Z" />
+                </follow>
+                <follow topic_id="2" id="12" number="1" text="follow 1"
+                        xmlns:flw="http://schemas.cybozu.co.jp/bulletin/2008">
+                    <flw:creator user_id="1" name="Administrator" date="2010-11-04T20:52:27Z" />
+                </follow>
+            </returns>
+        </schedule:BulletinGetFollowsResponse>
+    </soap:Body>
+</soap:Envelope>
