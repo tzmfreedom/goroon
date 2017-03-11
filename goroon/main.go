@@ -200,14 +200,14 @@ func main() {
 }
 
 func startStr(event *goroon.ScheduleEvent) string {
-	if event.EventType == "banner" {
+	if isNullTime(event.When.Datetime.Start) {
 		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
 	}
 	return event.When.Datetime.Start.Format("2006-01-02T15:04:05")
 }
 
 func endStr(event *goroon.ScheduleEvent) string {
-	if event.EventType == "banner" {
+	if isNullTime(event.When.Datetime.Start) {
 		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
 	}
 	return event.When.Datetime.End.Format("2006-01-02T15:04:05")
@@ -219,4 +219,9 @@ func members2str(members *goroon.Members) string {
 		ret = append(ret, m.User.Name)
 	}
 	return strings.Join(ret, ":")
+}
+
+func isNullTime(t time.Time) bool {
+	var nil time.Time
+	return t == nil
 }
