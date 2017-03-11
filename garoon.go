@@ -9,12 +9,17 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"net/http/cookiejar"
+	"net/url"
 )
 
 type Client struct {
-	endpoint string
-	header   *SoapHeader
+	Endpoint string
+	Username string
+	Password string
+	Locale   string
 	Debugger io.Writer
+	CookieId   string
 }
 
 type NopWriter struct{}
@@ -23,57 +28,49 @@ func (d *NopWriter) Write(b []byte) (int, error) {
 	return 0, nil
 }
 
-func NewClient(username string, password string, endpoint string) *Client {
+func NewClientByCredential(username string, password string, endpoint string) *Client {
 	return &Client{
-		endpoint: endpoint,
+		Endpoint: endpoint,
+		Username: username,
+		Password: password,
+		Locale:   "ja",
 		Debugger: &NopWriter{},
-		header: &SoapHeader{
-			Security: Security{
-				UsernameToken: UsernameToken{
-					Username: username,
-					Password: password,
-				},
-			},
-			Locale:    "jp",
-			Timestamp: Timestamp{},
-		},
 	}
 }
 
-func (c *Client) SetHeader(header *SoapHeader) {
-	c.header = header
+func NewClientByCookie(endpoint string, cookie string) *Client {
+	return &Client{
+		Endpoint: endpoint,
+		Locale:   "ja",
+		CookieId:   cookie,
+		Debugger: &NopWriter{},
+	}
 }
 
-func (c *Client) Request(action string, uri string, req interface{}, res interface{}) error {
+func (c *Client) Request(action string, path string, req interface{}, res interface{}) error {
 	envelope := &SoapEnvelope{}
-	envelope.SoapHeader = c.header
-	envelope.SoapHeader.Action = action
-
-	created := time.Now()
-	envelope.SoapHeader.Timestamp.Created = created
-	expires := created.Add(time.Duration(1) * time.Hour)
-	envelope.SoapHeader.Timestamp.Expires = expires
-
+	envelope.SoapHeader = c.createSoapHeader(action)
 	envelope.SoapBody = &SoapBody{Content: req}
 	b, err := xml.MarshalIndent(envelope, "", "	")
 	c.Debugger.Write(b)
+
 	msg, err := xml.Marshal(envelope)
 	if err != nil {
 		return err
 	}
+	client := c.createHttpClient()
 	buf := bytes.NewBuffer(msg)
-	resp, err := http.Post(uri, "text/xml", buf)
+	resp, err := client.Post(c.Endpoint + path, "text/xml", buf)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-
 	c.Debugger.Write(body)
+
 	res_env := &SoapEnvelope{SoapBody: &SoapBody{Content: res}}
-	err = xml.Unmarshal(body, res_env)
-	if err != nil {
+	if err = xml.Unmarshal(body, res_env); err != nil {
 		return err
 	}
 	if res_env.SoapBody.Fault != nil {
@@ -84,66 +81,96 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 }
 
 func (c *Client) ScheduleGetEventsByTarget(params *Parameters) (*Returns, error) {
-	uri := fmt.Sprintf("%s/cbpapi/schedule/api", c.endpoint)
 	req := &ScheduleGetEventsByTargetRequest{
 		Parameters: params,
 	}
 	res := &ScheduleGetEventsByTargetResponse{}
-	err := c.Request("ScheduleGetEventsByTarget", uri, req, res)
-	if err != nil {
+	if err := c.Request("ScheduleGetEventsByTarget", "/cbpapi/schedule/api", req, res); err != nil {
 		return nil, err
 	}
 	return res.Returns, nil
 }
 
 func (c *Client) UtilGetLoginUserId(params *Parameters) (*Returns, error) {
-	uri := fmt.Sprintf("%s/cbpapi/util/api", c.endpoint)
 	req := &UtilGetLoginUserIdRequest{
 		Parameters: params,
 	}
 	res := &UtilGetLoginUserIdResponse{}
-	err := c.Request("UtilGetLoginUserId", uri, req, res)
-	if err != nil {
+	if err := c.Request("UtilGetLoginUserId", "/cbpapi/util/api", req, res); err != nil {
 		return nil, err
 	}
 	return res.Returns, nil
 }
 
 func (c *Client) ScheduleGetEvents(params *Parameters) (*Returns, error) {
-	uri := fmt.Sprintf("%s/cbpapi/schedule/api", c.endpoint)
 	req := &ScheduleGetEventsRequest{
 		Parameters: params,
 	}
 	res := &ScheduleGetEventsResponse{}
-	err := c.Request("ScheduleGetEvents", uri, req, res)
-	if err != nil {
+	if err := c.Request("ScheduleGetEvents", "/cbpapi/schedule/api", req, res); err != nil {
 		return nil, err
 	}
 	return res.Returns, nil
 }
 
 func (c *Client) BaseGetUserByLoginName(params *Parameters) (*Returns, error) {
-	uri := fmt.Sprintf("%s/cbpapi/base/api", c.endpoint)
 	req := &BaseGetUserByLoginNameRequest{
 		Parameters: params,
 	}
 	res := &BaseGetUserByLoginNameResponse{}
-	err := c.Request("BaseGetUserByLoginName", uri, req, res)
-	if err != nil {
+	if err := c.Request("BaseGetUserByLoginName", "/cbpapi/base/api", req, res); err != nil {
 		return nil, err
 	}
 	return res.Returns, nil
 }
 
 func (c *Client) BulletinGetFollows(params *Parameters) (*Returns, error) {
-	uri := fmt.Sprintf("%s/cbpapi/bulletin/api", c.endpoint)
 	req := &BulletinGetFollowsRequest{
 		Parameters: params,
 	}
 	res := &BulletinGetFollowsResponse{}
-	err := c.Request("BulletinGetFollows", uri, req, res)
-	if err != nil {
+	if err := c.Request("BulletinGetFollows", "/cbpapi/bulletin/api", req, res); err != nil {
 		return nil, err
 	}
 	return res.Returns, nil
+}
+
+func (c *Client) createSoapHeader(action string) *SoapHeader {
+	header := &SoapHeader{
+		Locale: c.Locale,
+		Timestamp: Timestamp{},
+	}
+	header.Action = action
+	created := time.Now()
+	header.Timestamp.Created = created
+	expires := created.Add(time.Duration(1) * time.Hour)
+	header.Timestamp.Expires = expires
+
+	if c.Username != "" {
+		header.Security = Security {
+			UsernameToken: UsernameToken{
+				Username: c.Username,
+				Password: c.Password,
+			},
+		}
+	}
+	return header
+}
+
+func (c *Client) createHttpClient() *http.Client {
+	client := &http.Client{}
+	if c.CookieId != "" {
+		u, _ := url.Parse(c.Endpoint)
+		cookie := &http.Cookie{
+			Name:   "CBSESSID",
+			Value:  c.CookieId,
+			Path:   "/",
+			Domain: u.Host,
+		}
+		jar, _ := cookiejar.New(nil)
+		jar.SetCookies(u, []*http.Cookie{cookie})
+		client.Jar = jar
+
+	}
+	return client
 }

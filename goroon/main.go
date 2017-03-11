@@ -83,7 +83,7 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := goroon.NewClient(c.Username, c.Password, c.Endpoint)
+				client := goroon.NewClientByCredential(c.Username, c.Password, c.Endpoint)
 				if c.Debug {
 					client.Debugger = os.Stdout
 				}
@@ -180,7 +180,7 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := goroon.NewClient(c.Username, c.Password, c.Endpoint)
+				client := goroon.NewClientByCredential(c.Username, c.Password, c.Endpoint)
 				res, err := client.BulletinGetFollows(&goroon.Parameters{
 					TopicId: c.TopicId,
 					Offset:  c.Offset,
