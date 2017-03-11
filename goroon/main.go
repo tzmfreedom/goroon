@@ -201,16 +201,16 @@ func main() {
 
 func startStr(event *goroon.ScheduleEvent) string {
 	if isNullTime(event.When.Datetime.Start) {
-		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
+		return formatDate(event.When.Date.Start)
 	}
-	return event.When.Datetime.Start.Format("2006-01-02T15:04:05")
+	return formatDatetime(event.When.Datetime.Start)
 }
 
 func endStr(event *goroon.ScheduleEvent) string {
-	if isNullTime(event.When.Datetime.Start) {
-		return fmt.Sprintf("%s00:00:00", event.When.Date.Start.Format("2006-01-02T"))
+	if isNullTime(event.When.Datetime.End) {
+		return formatDate(event.When.Date.End)
 	}
-	return event.When.Datetime.End.Format("2006-01-02T15:04:05")
+	return formatDatetime(event.When.Datetime.End)
 }
 
 func members2str(members *goroon.Members) string {
@@ -224,4 +224,12 @@ func members2str(members *goroon.Members) string {
 func isNullTime(t time.Time) bool {
 	var nil time.Time
 	return t == nil
+}
+
+func formatDate(t time.Time) string {
+	return t.Format("2006-01-02")
+}
+
+func formatDatetime(t time.Time) string {
+	return t.In(time.Local).Format("2006-01-02T15:04:05")
 }
