@@ -72,7 +72,14 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 	c.Debugger.Write(body)
 	res_env := &SoapEnvelope{SoapBody: &SoapBody{Content: res}}
 	err = xml.Unmarshal(body, res_env)
-	return err
+	if err != nil {
+		return err
+	}
+	if res_env.SoapBody.Fault != nil {
+		msg := fmt.Sprintf("Soap Fault is occured: %s: %s", res_env.SoapBody.Fault.Code, res_env.SoapBody.Fault.Detail))
+		return error.New(msg)
+	}
+	return nil
 }
 
 func (c *Client) ScheduleGetEventsByTarget(params *Parameters) (*Returns, error) {
