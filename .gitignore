@@ -1,2 +1,5 @@
-.idea
-vendor
+/.idea/
+/vendor/
+/dist/
+/bin/
+*.tar.gz

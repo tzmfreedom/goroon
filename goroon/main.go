@@ -10,8 +10,9 @@ import (
 	"github.com/urfave/cli"
 )
 
-const (
-	VERSION = "0.1.0"
+var (
+	Version  string
+	Revision string
 )
 
 type config struct {
@@ -29,11 +30,15 @@ type config struct {
 }
 
 func main() {
+	cli.VersionPrinter = func(c *cli.Context) {
+		fmt.Printf("version=%s revision=%s\n", c.App.Version, Revision)
+	}
+
 	c := &config{}
 	app := cli.NewApp()
 	app.Name = "goroon"
 	app.Usage = "garoon utility"
-	app.Version = VERSION
+	app.Version = Version
 	app.Commands = []cli.Command{
 		{
 			Name:    "schedule",

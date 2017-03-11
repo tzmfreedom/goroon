@@ -1,17 +1,58 @@
-.PHONY: test install uninstall
+NAME := goroon
+SRCS := $(shell find . -type d -name vendor -prune -o -type f -name "*.go" -print)
+VERSION := 0.1.0
+REVISION := $(shell git rev-parse --short HEAD)
+LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\"" 
 
-test: build
-	@go test -v ./...
+.DEFAULT_GOAL := bin/$(NAME) 
 
+.PHONY: test
+test: glide
+	@go test -cover -v `glide novendor`
+
+.PHONY: install
 install: build
 	@go install ./goroon
 
+.PHONY: uninstall
 uninstall:
 
+.PHONY: clean
 clean:
-	@go clean
+	@rm -rf bin/*
+	@rm -rf vendor/*
+	@rm -rf dist/*
 
-build: clean
+.PHONY: dist-clean
+dist-clean: clean
+	@rm -f $(NAME).tar.gz
+
+.PHONY: cross-build
+cross-build: clean
 	-@goimports -w .
 	@gofmt -w .
-	@go build -o cmd ./goroon
+	@go build $(LDFLAGS)
+	@for os in darwin linux windows; do \
+	    for arch in amd64 386; do \
+	        GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo \
+	        -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME); \
+	    done; \
+	done
+
+.PHONY: glide
+glide:
+ifeq ($(shell command -v glide 2> /dev/null),)
+	curl https://glide.sh/get | sh
+endif
+
+.PHONY: deps
+deps: glide
+	glide install
+
+.PHONY: bin/$(NAME) 
+bin/$(NAME): $(SRCS)
+	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$(NAME) ./goroon
+
+.PHONY: dist
+dist:
+	@tar czfh $(NAME).tar.gz $(shell git ls-files)
