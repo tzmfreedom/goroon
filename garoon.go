@@ -3,6 +3,7 @@ package goroon
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -76,8 +77,8 @@ func (c *Client) Request(action string, uri string, req interface{}, res interfa
 		return err
 	}
 	if res_env.SoapBody.Fault != nil {
-		msg := fmt.Sprintf("Soap Fault is occured: %s: %s", res_env.SoapBody.Fault.Code, res_env.SoapBody.Fault.Detail))
-		return error.New(msg)
+		msg := fmt.Sprintf("Soap Fault is occured: %s: %s", res_env.SoapBody.Fault.Code, res_env.SoapBody.Fault.Detail)
+		return errors.New(msg)
 	}
 	return nil
 }

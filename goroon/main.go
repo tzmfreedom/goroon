@@ -231,7 +231,7 @@ func isNullTime(t time.Time) bool {
 	return t == nil
 }
 
-func formatDate(t time.Time) string {
+func formatDate(t goroon.XmlDate) string {
 	return t.Format("2006-01-02")
 }
 
