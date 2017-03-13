@@ -27,11 +27,16 @@ clean:
 dist-clean: clean
 	@rm -f $(NAME).tar.gz
 
+.PHONY: build
+build:
+	-@goimports -w .
+	@gofmt -w .
+	@go build $(LDFLAGS)
+
 .PHONY: cross-build
 cross-build: clean
 	-@goimports -w .
 	@gofmt -w .
-	@go build $(LDFLAGS)
 	@for os in darwin linux windows; do \
 	    for arch in amd64 386; do \
 	        GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo \
