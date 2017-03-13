@@ -28,10 +28,17 @@ type SoapHeader struct {
 type SoapFault struct {
 	XMLName xml.Name `xml:"http://www.w3.org/2003/05/soap-envelope Fault"`
 
-	Code   string `xml:"faultcode,omitempty"`
-	String string `xml:"faultstring,omitempty"`
-	Actor  string `xml:"faultactor,omitempty"`
-	Detail string `xml:"detail,omitempty"`
+	Code   string `xml:"Code,omitempty"`
+	Reason string `xml:"Reason,omitempty"`
+	Actor  string `xml:"Actor,omitempty"`
+	Detail string `xml:"Detail,omitempty"`
+}
+
+type FaultDetail struct {
+	Code           string `xml:"code"`
+	Diagnosis      string `xml:"diagnosis"`
+	Cause          string `xml:"cause"`
+	CounterMeasure string `xml:"counter_measure"`
 }
 
 type Security struct {
@@ -61,6 +68,7 @@ type Parameters struct {
 	TopicId   int         `xml:"topic_id,attr"`
 	Offset    int         `xml:"offset,attr"`
 	Limit     int         `xml:"limit,attr"`
+	Password  string      `xml:"password"`
 }
 
 type ScheduleGetEventsByTargetResponse struct {
@@ -73,6 +81,9 @@ type Returns struct {
 	Follow         []Follow        `xml:"follow,omitempty"`
 	UserId         int             `xml:"user_id, omitempty"`
 	User           []User          `xml:"user,omitempty"`
+	LoginName      string          `xml:"login_name,omitempty"`
+	Status         string          `xml:"status,omitempty"`
+	Cookie         string          `xml:"cookie,omitempty"`
 }
 
 type Follow struct {
@@ -193,6 +204,16 @@ type BulletinGetFollowsRequest struct {
 
 type BulletinGetFollowsResponse struct {
 	XMLName xml.Name `xml:"BulletinGetFollowsResponse"`
+	Returns *Returns `xml:"returns"`
+}
+
+type UtilLoginRequest struct {
+	XMLName    xml.Name    `xml:"UtilLogin"`
+	Parameters *Parameters `xml:"parameters"`
+}
+
+type UtilLoginResponse struct {
+	XMLName xml.Name `xml:"UtilLoginResponse"`
 	Returns *Returns `xml:"returns"`
 }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope
+        xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Header>
+        <vendor>Cybozu</vendor>
+        <product>Garoon</product>
+        <product_type>1</product_type>
+        <version>3.7.5</version>
+        <apiversion>1.3.1</apiversion>
+    </soap:Header>
+    <soap:Body>
+        <UtilLoginResponse>
+            <returns>
+                <login_name>Administrator</login_name>
+                <status>Login</status>
+                <cookie>
+                    CBSESSID=C735B4069ccf104Ce0f2bf12a7cc62f115db9e676f6e72f2; path=/
+                </cookie>
+            </returns>
+        </UtilLoginResponse>
+    </soap:Body>
+</soap:Envelope>

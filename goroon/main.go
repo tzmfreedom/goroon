@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/tzmfreedom/goroon"
 	"github.com/urfave/cli"
 )
@@ -40,6 +44,47 @@ func main() {
 	app.Usage = "garoon utility"
 	app.Version = Version
 	app.Commands = []cli.Command{
+		{
+			Name:    "login",
+			Aliases: []string{"l"},
+			Usage:   "login to garoon",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:        "username, u",
+					Destination: &c.Username,
+					EnvVar:      "GAROON_USERNAME",
+				},
+				cli.StringFlag{
+					Name:        "password, p",
+					Destination: &c.Password,
+					EnvVar:      "GAROON_PASSWORD",
+				},
+				cli.StringFlag{
+					Name:        "endpoint, e",
+					Destination: &c.Endpoint,
+					EnvVar:      "GAROON_ENDPOINT",
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				client := goroon.NewClient(c.Endpoint)
+				// login to garoon
+				res, err := client.UtilLogin(&goroon.Parameters{
+					LoginName: []string{c.Username},
+					Password:  c.Password,
+				})
+				if err != nil {
+					return err
+				}
+				r := regexp.MustCompile(`CBSESSID=(.+?);`)
+				group := r.FindAllStringSubmatch(res.Cookie, -1)
+				home, err := homedir.Dir()
+				if err != nil {
+					return err
+				}
+				err = ioutil.WriteFile(filepath.Join(home, ".goroon"), []byte(group[0][1]), 600)
+				return err
+			},
+		},
 		{
 			Name:    "schedule",
 			Aliases: []string{"s"},
@@ -83,7 +128,9 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := goroon.NewClientByCredential(c.Username, c.Password, c.Endpoint)
+				client := goroon.NewClient(c.Endpoint)
+				client.Username = c.Username
+				client.Password = c.Password
 				if c.Debug {
 					client.Debugger = os.Stdout
 				}
@@ -180,7 +227,9 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := goroon.NewClientByCredential(c.Username, c.Password, c.Endpoint)
+				client := goroon.NewClient(c.Endpoint)
+				client.Username = c.Username
+				client.Password = c.Password
 				res, err := client.BulletinGetFollows(&goroon.Parameters{
 					TopicId: c.TopicId,
 					Offset:  c.Offset,

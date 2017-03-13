@@ -1,6 +1,7 @@
 package goroon
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -14,7 +15,10 @@ func TestScheduleGetEventsByTarget(t *testing.T) {
 		Post("/cbpapi/schedule/api").
 		Reply(200).File("./test/fixtures/schedule/get_events_by_target.xml")
 
-	client := NewClient("username", "password", "https://garoon.com")
+	client := NewClient("https://garoon.com")
+	client.Username = "username"
+	client.Password = "password"
+
 	tm := time.Now()
 	req := Parameters{
 		Start: XmlDateTime{tm},
@@ -59,7 +63,10 @@ func TestScheduleGetEvents(t *testing.T) {
 		Post("/cbpapi/schedule/api").
 		Reply(200).File("./test/fixtures/schedule/get_events.xml")
 
-	client := NewClient("username", "password", "https://garoon.com")
+	client := NewClient("https://garoon.com")
+	client.Username = "username"
+	client.Password = "password"
+
 	tm := time.Now()
 	req := Parameters{
 		Start: XmlDateTime{tm},
@@ -101,7 +108,10 @@ func TestBaseGetUserByLoginName(t *testing.T) {
 		Post("/cbpapi/base/api").
 		Reply(200).File("./test/fixtures/base/get_user_by_login_name.xml")
 
-	client := NewClient("username", "password", "https://garoon.com")
+	client := NewClient("https://garoon.com")
+	client.Username = "username"
+	client.Password = "password"
+
 	req := Parameters{
 		LoginName: []string{"hoge"},
 	}
@@ -156,7 +166,10 @@ func TestBulletinGetFollows(t *testing.T) {
 		Post("/cbpapi/bulletin/api").
 		Reply(200).File("./test/fixtures/bulletin/get_follows.xml")
 
-	client := NewClient("username", "password", "https://garoon.com")
+	client := NewClient("https://garoon.com")
+	client.Username = "username"
+	client.Password = "password"
+
 	req := Parameters{
 		TopicId: 123,
 		Offset:  0,
@@ -168,5 +181,35 @@ func TestBulletinGetFollows(t *testing.T) {
 	}
 	if len(res.Follow) != 4 {
 		t.Fatalf("expect %v, get %v", 4, len(res.Follow))
+	}
+}
+
+func TestUtilLogin(t *testing.T) {
+	defer gock.Off()
+
+	gock.New("https://garoon.com").
+		Post("/util_api/util_api/api").
+		Reply(200).File("./test/fixtures/util_api/util_login.xml")
+
+	client := NewClient("https://garoon.com")
+	client.Username = "username"
+	client.Password = "password"
+
+	req := Parameters{
+		LoginName: []string{"username"},
+		Password:  "password",
+	}
+	res, err := client.UtilLogin(&req)
+	if err != nil {
+		t.Fatalf("error is occured. %s", err.Error())
+	}
+	if !strings.Contains(res.Cookie, "CBSESSID=C735B4069ccf104Ce0f2bf12a7cc62f115db9e676f6e72f2;") {
+		t.Fatalf("expect %v, get %v", "", res.Cookie)
+	}
+	if res.LoginName != "Administrator" {
+		t.Fatalf("expect %v, get %v", "Administrator", res.LoginName)
+	}
+	if res.Status != "Login" {
+		t.Fatalf("expect %v, get %v", "Login", res.Status)
 	}
 }

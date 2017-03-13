@@ -8,9 +8,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
 	"net/http/cookiejar"
 	"net/url"
+	"time"
 )
 
 type Client struct {
@@ -19,7 +19,7 @@ type Client struct {
 	Password string
 	Locale   string
 	Debugger io.Writer
-	CookieId   string
+	CookieId string
 }
 
 type NopWriter struct{}
@@ -28,21 +28,10 @@ func (d *NopWriter) Write(b []byte) (int, error) {
 	return 0, nil
 }
 
-func NewClientByCredential(username string, password string, endpoint string) *Client {
-	return &Client{
-		Endpoint: endpoint,
-		Username: username,
-		Password: password,
-		Locale:   "ja",
-		Debugger: &NopWriter{},
-	}
-}
-
-func NewClientByCookie(endpoint string, cookie string) *Client {
+func NewClient(endpoint string) *Client {
 	return &Client{
 		Endpoint: endpoint,
 		Locale:   "ja",
-		CookieId:   cookie,
 		Debugger: &NopWriter{},
 	}
 }
@@ -60,7 +49,7 @@ func (c *Client) Request(action string, path string, req interface{}, res interf
 	}
 	client := c.createHttpClient()
 	buf := bytes.NewBuffer(msg)
-	resp, err := client.Post(c.Endpoint + path, "text/xml", buf)
+	resp, err := client.Post(c.Endpoint+path, "text/xml", buf)
 	if err != nil {
 		return err
 	}
@@ -135,9 +124,20 @@ func (c *Client) BulletinGetFollows(params *Parameters) (*Returns, error) {
 	return res.Returns, nil
 }
 
+func (c *Client) UtilLogin(params *Parameters) (*Returns, error) {
+	req := &UtilLoginRequest{
+		Parameters: params,
+	}
+	res := &UtilLoginResponse{}
+	if err := c.Request("UtilLogin", "/util_api/util_api/api", req, res); err != nil {
+		return nil, err
+	}
+	return res.Returns, nil
+}
+
 func (c *Client) createSoapHeader(action string) *SoapHeader {
 	header := &SoapHeader{
-		Locale: c.Locale,
+		Locale:    c.Locale,
 		Timestamp: Timestamp{},
 	}
 	header.Action = action
@@ -147,7 +147,7 @@ func (c *Client) createSoapHeader(action string) *SoapHeader {
 	header.Timestamp.Expires = expires
 
 	if c.Username != "" {
-		header.Security = Security {
+		header.Security = Security{
 			UsernameToken: UsernameToken{
 				Username: c.Username,
 				Password: c.Password,
