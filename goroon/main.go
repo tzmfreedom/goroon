@@ -67,7 +67,6 @@ func main() {
 			},
 			Action: func(ctx *cli.Context) error {
 				client := goroon.NewClient(c.Endpoint)
-				// login to garoon
 				res, err := client.UtilLogin(&goroon.Parameters{
 					LoginName: []string{c.Username},
 					Password:  c.Password,
@@ -128,9 +127,7 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := goroon.NewClient(c.Endpoint)
-				client.Username = c.Username
-				client.Password = c.Password
+				client := newGaroonClient(c.Username, c.Password, c.Endpoint)
 				if c.Debug {
 					client.Debugger = os.Stdout
 				}
@@ -227,9 +224,7 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := goroon.NewClient(c.Endpoint)
-				client.Username = c.Username
-				client.Password = c.Password
+				client := newGaroonClient(c.Username, c.Password, c.Endpoint)
 				res, err := client.BulletinGetFollows(&goroon.Parameters{
 					TopicId: c.TopicId,
 					Offset:  c.Offset,
@@ -286,4 +281,25 @@ func formatDate(t goroon.XmlDate) string {
 
 func formatDatetime(t time.Time) string {
 	return t.In(time.Local).Format("2006-01-02T15:04:05")
+}
+
+func readSessionId() (string, error) {
+	home, err := homedir.Dir()
+	if err != nil {
+		return "", err
+	}
+	b, err := ioutil.ReadFile(filepath.Join(home, ".goroon"))
+	return string(b), nil
+}
+
+func newGaroonClient(username string, password string, endpoint string) *goroon.Client {
+	client := goroon.NewClient(endpoint)
+	sessId, err := readSessionId()
+	if err == nil {
+		client.SessionId = sessId
+	} else {
+		client.Username = username
+		client.Password = password
+	}
+	return client
 }

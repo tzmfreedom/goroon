@@ -14,12 +14,12 @@ import (
 )
 
 type Client struct {
-	Endpoint string
-	Username string
-	Password string
-	Locale   string
-	Debugger io.Writer
-	CookieId string
+	Endpoint  string
+	Username  string
+	Password  string
+	Locale    string
+	Debugger  io.Writer
+	SessionId string
 }
 
 type NopWriter struct{}
@@ -159,11 +159,11 @@ func (c *Client) createSoapHeader(action string) *SoapHeader {
 
 func (c *Client) createHttpClient() *http.Client {
 	client := &http.Client{}
-	if c.CookieId != "" {
+	if c.SessionId != "" {
 		u, _ := url.Parse(c.Endpoint)
 		cookie := &http.Cookie{
 			Name:   "CBSESSID",
-			Value:  c.CookieId,
+			Value:  c.SessionId,
 			Path:   "/",
 			Domain: u.Host,
 		}
