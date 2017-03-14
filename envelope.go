@@ -213,7 +213,7 @@ type UtilLoginRequest struct {
 }
 
 type UtilLoginResponse struct {
-	XMLName xml.Name `xml:"UtilLoginResponse"`
+	XMLName xml.Name `xml:"LoginResponse"`
 	Returns *Returns `xml:"returns"`
 }
 

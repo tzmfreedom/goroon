@@ -129,7 +129,7 @@ func (c *Client) UtilLogin(params *Parameters) (*Returns, error) {
 		Parameters: params,
 	}
 	res := &UtilLoginResponse{}
-	if err := c.Request("UtilLogin", "/util_api/util_api/api", req, res); err != nil {
+	if err := c.Request("UtilLogin", "/util_api/util/api", req, res); err != nil {
 		return nil, err
 	}
 	return res.Returns, nil

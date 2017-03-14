@@ -64,9 +64,16 @@ func main() {
 					Destination: &c.Endpoint,
 					EnvVar:      "GAROON_ENDPOINT",
 				},
+				cli.BoolFlag{
+					Name:        "debug, d",
+					Destination: &c.Debug,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
 				client := goroon.NewClient(c.Endpoint)
+				if c.Debug {
+					client.Debugger = os.Stdout
+				}
 				res, err := client.UtilLogin(&goroon.Parameters{
 					LoginName: []string{c.Username},
 					Password:  c.Password,
@@ -80,7 +87,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				err = ioutil.WriteFile(filepath.Join(home, ".goroon"), []byte(group[0][1]), 600)
+				err = ioutil.WriteFile(filepath.Join(home, ".goroon"), []byte(group[0][1]), 0600)
 				return err
 			},
 		},

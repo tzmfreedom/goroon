@@ -188,7 +188,7 @@ func TestUtilLogin(t *testing.T) {
 	defer gock.Off()
 
 	gock.New("https://garoon.com").
-		Post("/util_api/util_api/api").
+		Post("/util_api/util/api").
 		Reply(200).File("./test/fixtures/util_api/util_login.xml")
 
 	client := NewClient("https://garoon.com")
