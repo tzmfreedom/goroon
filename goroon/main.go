@@ -31,6 +31,7 @@ type config struct {
 	Offset   int
 	Limit    int
 	Type     string
+	Columns  string
 }
 
 func main() {
@@ -128,6 +129,11 @@ func main() {
 					Destination: &c.Type,
 					Value:       "all",
 				},
+				cli.StringFlag{
+					Name:        "columns, c",
+					Destination: &c.Type,
+					Value:       "id,type,start,end,description,detail",
+				},
 				cli.BoolFlag{
 					Name:        "debug, d",
 					Destination: &c.Debug,
@@ -175,19 +181,12 @@ func main() {
 					}
 				}
 
+				print_cols := strings.Split(c.Columns, ",")
 				for _, event := range returns.ScheduleEvents {
 					if c.Type != "all" && event.EventType != c.Type {
 						continue
 					}
-					fmt.Println(strings.Join([]string{
-						fmt.Sprint(event.Id),
-						members2str(&event.Members),
-						event.EventType,
-						strings.Replace(event.Detail, "\n", "", -1),
-						strings.Replace(event.Description, "\n", "", -1),
-						startStr(&event),
-						endStr(&event),
-					}, "\t"))
+					printScheduleEvent(&event, print_cols)
 				}
 				return nil
 			},
@@ -309,4 +308,29 @@ func newGaroonClient(username string, password string, endpoint string) *goroon.
 		client.Password = password
 	}
 	return client
+}
+
+func printScheduleEvent(e *goroon.ScheduleEvent, cols []string) {
+	print_cols := []string{}
+	for _, col := range cols {
+		print_col := ""
+		switch col {
+		case "id":
+			print_col = fmt.Sprint(e.Id)
+		case "members":
+			print_col = members2str(&e.Members)
+		case "type":
+			print_col = e.EventType
+		case "detail":
+			print_col = strings.Replace(e.Detail, "\n", "", -1)
+		case "desc":
+			print_col = strings.Replace(e.Description, "\n", "", -1)
+		case "start":
+			print_col = startStr(e)
+		case "end":
+			print_col = endStr(e)
+		}
+		print_cols = append(print_cols, print_col)
+	}
+	fmt.Println(strings.Join(print_cols, "\t"))
 }
