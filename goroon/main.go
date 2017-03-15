@@ -131,7 +131,7 @@ func main() {
 				},
 				cli.StringFlag{
 					Name:        "columns, c",
-					Destination: &c.Type,
+					Destination: &c.Columns,
 					Value:       "id,type,start,end,description,detail",
 				},
 				cli.BoolFlag{
