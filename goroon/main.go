@@ -32,6 +32,7 @@ type config struct {
 	Limit    int
 	Type     string
 	Columns  string
+	Date     string
 }
 
 func main() {
@@ -140,17 +141,28 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := newGaroonClient(c.Username, c.Password, c.Endpoint)
-				if c.Debug {
-					client.Debugger = os.Stdout
-				}
-				start, err := time.ParseInLocation("2006-01-02 15:04:05", c.Start, time.Local)
-				if err != nil {
-					return err
-				}
-				end, err := time.ParseInLocation("2006-01-02 15:04:05", c.End, time.Local)
-				if err != nil {
-					return err
+				client := newGaroonClient(c.Username, c.Password, c.Endpoint, c.Debug)
+				var (
+					start time.Time
+					end   time.Time
+					err   error
+				)
+				switch c.Date {
+				case "":
+					start, err = time.ParseInLocation("2006-01-02 15:04:05", c.Start, time.Local)
+					if err != nil {
+						return err
+					}
+					end, err = time.ParseInLocation("2006-01-02 15:04:05", c.End, time.Local)
+					if err != nil {
+						return err
+					}
+				case "today":
+					start = time.Now()
+					end = time.Now().AddDate(0, 0, 1)
+				case "yesterday":
+					start = time.Now().AddDate(0, 0, -1)
+					end = time.Now()
 				}
 
 				var returns *goroon.Returns
@@ -225,12 +237,16 @@ func main() {
 					Value:       20,
 				},
 				cli.BoolFlag{
-					Name:        "debug, d",
+					Name:        "debug, D",
 					Destination: &c.Debug,
+				},
+				cli.StringFlag{
+					Name:        "date, d",
+					Destination: &c.Date,
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := newGaroonClient(c.Username, c.Password, c.Endpoint)
+				client := newGaroonClient(c.Username, c.Password, c.Endpoint, c.Debug)
 				res, err := client.BulletinGetFollows(&goroon.Parameters{
 					TopicId: c.TopicId,
 					Offset:  c.Offset,
@@ -298,8 +314,11 @@ func readSessionId() (string, error) {
 	return string(b), nil
 }
 
-func newGaroonClient(username string, password string, endpoint string) *goroon.Client {
+func newGaroonClient(username string, password string, endpoint string, debug bool) *goroon.Client {
 	client := goroon.NewClient(endpoint)
+	if debug {
+		client.Debugger = os.Stdout
+	}
 	sessId, err := readSessionId()
 	if err == nil {
 		client.SessionId = sessId
