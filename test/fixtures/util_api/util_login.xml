@@ -11,7 +11,7 @@
         <apiversion>1.3.1</apiversion>
     </soap:Header>
     <soap:Body>
-        <UtilLoginResponse>
+        <LoginResponse>
             <returns>
                 <login_name>Administrator</login_name>
                 <status>Login</status>
@@ -19,6 +19,6 @@
                     CBSESSID=C735B4069ccf104Ce0f2bf12a7cc62f115db9e676f6e72f2; path=/
                 </cookie>
             </returns>
-        </UtilLoginResponse>
+        </LoginResponse>
     </soap:Body>
 </soap:Envelope>

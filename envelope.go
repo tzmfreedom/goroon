@@ -79,7 +79,7 @@ type ScheduleGetEventsByTargetResponse struct {
 type Returns struct {
 	ScheduleEvents []ScheduleEvent `xml:"schedule_event,omitempty"`
 	Follow         []Follow        `xml:"follow,omitempty"`
-	UserId         int             `xml:"user_id, omitempty"`
+	UserId         int             `xml:"user_id,omitempty"`
 	User           []User          `xml:"user,omitempty"`
 	LoginName      string          `xml:"login_name,omitempty"`
 	Status         string          `xml:"status,omitempty"`
@@ -87,18 +87,17 @@ type Returns struct {
 }
 
 type Follow struct {
-	XMLName xml.Name `xml:"follow"`
 	Creator *Creator `xml:"http://schemas.cybozu.co.jp/bulletin/2008 creator"`
-	TopicId int      `xml:"topic_id"`
-	Id      int      `xml:"id"`
-	Number  int      `xml:"number"`
-	Text    string   `xml:"text"`
+	TopicId int      `xml:"topic_id,attr,omitempty"`
+	Id      int      `xml:"id,attr,omitempty"`
+	Number  int      `xml:"number,attr,omitempty"`
+	Text    string   `xml:"text,attr,omitempty"`
 }
 
 type Creator struct {
-	UserId int       `xml:"user_id"`
-	Name   string    `xml:"huy"`
-	Date   time.Time `xml:"date"`
+	UserId int       `xml:"user_id,attr,omitempty"`
+	Name   string    `xml:"name,attr,omitempty"`
+	Date   time.Time `xml:"date,attr,omitempty"`
 }
 
 type ScheduleEvent struct {
@@ -258,7 +257,7 @@ Loop:
 		case xml.StartElement:
 			if consumed {
 				return xml.UnmarshalError("Found multiple elements inside SOAP body; not wrapped-document/literal WS-I compliant")
-			} else if se.Name.Space == "http://schemas.xmlsoap.org/soap/envelope/" && se.Name.Local == "Fault" {
+			} else if se.Name.Space == "http://www.w3.org/2003/05/soap-envelope" && se.Name.Local == "Fault" {
 				b.Fault = &SoapFault{}
 				b.Content = nil
 				err = d.DecodeElement(b.Fault, &se)

@@ -182,6 +182,9 @@ func TestBulletinGetFollows(t *testing.T) {
 	if len(res.Follow) != 4 {
 		t.Fatalf("expect %v, get %v", 4, len(res.Follow))
 	}
+	if res.Follow[0].Creator.Name != "huy" {
+		t.Fatalf("expect %v, get %v", "huy", res.Follow[0].Creator.Name)
+	}
 }
 
 func TestUtilLogin(t *testing.T) {
