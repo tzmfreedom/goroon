@@ -67,7 +67,7 @@ func main() {
 					EnvVar:      "GAROON_ENDPOINT",
 				},
 				cli.BoolFlag{
-					Name:        "debug, d",
+					Name:        "debug, D",
 					Destination: &c.Debug,
 				},
 			},
@@ -136,8 +136,12 @@ func main() {
 					Value:       "id,type,start,end,description,detail",
 				},
 				cli.BoolFlag{
-					Name:        "debug, d",
+					Name:        "debug, D",
 					Destination: &c.Debug,
+				},
+				cli.StringFlag{
+					Name:        "date, d",
+					Destination: &c.Date,
 				},
 			},
 			Action: func(ctx *cli.Context) error {
@@ -239,10 +243,6 @@ func main() {
 				cli.BoolFlag{
 					Name:        "debug, D",
 					Destination: &c.Debug,
-				},
-				cli.StringFlag{
-					Name:        "date, d",
-					Destination: &c.Date,
 				},
 			},
 			Action: func(ctx *cli.Context) error {
