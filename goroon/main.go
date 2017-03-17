@@ -244,6 +244,11 @@ func main() {
 					Name:        "date, d",
 					Destination: &c.Date,
 				},
+				cli.StringFlag{
+					Name:        "columns, c",
+					Destination: &c.Columns,
+					Value:       "id,creator,text",
+				},
 			},
 			Action: func(ctx *cli.Context) error {
 				client := newGaroonClient(c.Username, c.Password, c.Endpoint, c.Debug)
@@ -255,13 +260,9 @@ func main() {
 				if err != nil {
 					return err
 				}
-
+				print_cols := strings.Split(c.Columns, ",")
 				for _, follow := range res.Follow {
-					fmt.Println(strings.Join([]string{
-						fmt.Sprint(follow.Number),
-						follow.Creator.Name,
-						follow.Text,
-					}, "\t"))
+					printFollow(&follow, print_cols)
 				}
 				return nil
 			},
@@ -348,6 +349,23 @@ func printScheduleEvent(e *goroon.ScheduleEvent, cols []string) {
 			print_col = startStr(e)
 		case "end":
 			print_col = endStr(e)
+		}
+		print_cols = append(print_cols, print_col)
+	}
+	fmt.Println(strings.Join(print_cols, "\t"))
+}
+
+func printFollow(f *goroon.Follow, cols []string) {
+	print_cols := []string{}
+	for _, col := range cols {
+		print_col := ""
+		switch col {
+		case "id":
+			print_col = fmt.Sprint(f.Number)
+		case "members":
+			print_col = f.Creator.Name
+		case "text":
+			print_col = strings.Replace(f.Text, "\n", "", -1)
 		}
 		print_cols = append(print_cols, print_col)
 	}
