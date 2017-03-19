@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/mitchellh/go-homedir"
 	"github.com/tzmfreedom/goroon"
 	"github.com/urfave/cli"
@@ -33,6 +34,11 @@ type config struct {
 	Type     string
 	Columns  string
 	Date     string
+}
+
+type configFile struct {
+	SessionId string
+	Endpoint  string
 }
 
 func main() {
@@ -85,11 +91,7 @@ func main() {
 				}
 				r := regexp.MustCompile(`CBSESSID=(.+?);`)
 				group := r.FindAllStringSubmatch(res.Cookie, -1)
-				home, err := homedir.Dir()
-				if err != nil {
-					return err
-				}
-				err = ioutil.WriteFile(filepath.Join(home, ".goroon"), []byte(group[0][1]), 0600)
+				createConfigFile(group[0][1], c.Endpoint)
 				return err
 			},
 		},
@@ -141,7 +143,7 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := newGaroonClient(c.Username, c.Password, c.Endpoint, c.Debug)
+				client := newGaroonClient(c)
 				var (
 					start time.Time
 					end   time.Time
@@ -251,7 +253,7 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				client := newGaroonClient(c.Username, c.Password, c.Endpoint, c.Debug)
+				client := newGaroonClient(c)
 				res, err := client.BulletinGetFollows(&goroon.Parameters{
 					TopicId: c.TopicId,
 					Offset:  c.Offset,
@@ -306,26 +308,32 @@ func formatDatetime(t time.Time) string {
 	return t.In(time.Local).Format("2006-01-02T15:04:05")
 }
 
-func readSessionId() (string, error) {
+func readConfigFile() (*configFile, error) {
 	home, err := homedir.Dir()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	b, err := ioutil.ReadFile(filepath.Join(home, ".goroon"))
-	return string(b), nil
+	if err != nil {
+		return nil, err
+	}
+	cf := &configFile{}
+	err = toml.Unmarshal(b, cf)
+	return cf, err
 }
 
-func newGaroonClient(username string, password string, endpoint string, debug bool) *goroon.Client {
-	client := goroon.NewClient(endpoint)
-	if debug {
+func newGaroonClient(c *config) *goroon.Client {
+	client := goroon.NewClient(c.Endpoint)
+	if c.Debug {
 		client.Debugger = os.Stdout
 	}
-	sessId, err := readSessionId()
+	cf, err := readConfigFile()
 	if err == nil {
-		client.SessionId = sessId
+		client.SessionId = cf.SessionId
+		client.Endpoint = cf.Endpoint
 	} else {
-		client.Username = username
-		client.Password = password
+		client.Username = c.Username
+		client.Password = c.Password
 	}
 	return client
 }
@@ -370,4 +378,21 @@ func printFollow(f *goroon.Follow, cols []string) {
 		print_cols = append(print_cols, print_col)
 	}
 	fmt.Println(strings.Join(print_cols, "\t"))
+}
+
+func createConfigFile(sessionId string, endpoint string) error {
+	home, err := homedir.Dir()
+	if err != nil {
+		return err
+	}
+	f, err := os.Create(filepath.Join(home, ".goroon"))
+	if err != nil {
+		return err
+	}
+	e := toml.NewEncoder(f)
+	err = e.Encode(&configFile{
+		SessionId: sessionId,
+		Endpoint:  endpoint,
+	})
+	return err
 }
