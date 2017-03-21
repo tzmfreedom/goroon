@@ -155,20 +155,30 @@ func main() {
 				)
 				switch c.Date {
 				case "":
-					start, err = time.ParseInLocation("2006-01-02 15:04:05", c.Start, time.Local)
-					if err != nil {
-						return err
+					if c.Start != "" {
+						start, err = time.ParseInLocation("2006-01-02 15:04:05", c.Start, time.Local)
+						if err != nil {
+							return err
+						}
+					} else {
+						start = beginningOfDay(time.Now())
 					}
-					end, err = time.ParseInLocation("2006-01-02 15:04:05", c.End, time.Local)
-					if err != nil {
-						return err
+					if c.End != "" {
+						end, err = time.ParseInLocation("2006-01-02 15:04:05", c.End, time.Local)
+						if err != nil {
+							return err
+						}
+					} else {
+						end = endOfDay(time.Now())
 					}
 				case "today":
-					start = time.Now()
-					end = time.Now().AddDate(0, 0, 1)
+					now := time.Now()
+					start = beginningOfDay(now)
+					end = endOfDay(now)
 				case "yesterday":
-					start = time.Now().AddDate(0, 0, -1)
-					end = time.Now()
+					yesterday := time.Now().AddDate(0, 0, -1)
+					start = beginningOfDay(yesterday)
+					end = endOfDay(yesterday)
 				}
 
 				var returns *goroon.Returns
@@ -395,4 +405,14 @@ func createConfigFile(sessionId string, endpoint string) error {
 		Endpoint:  endpoint,
 	})
 	return err
+}
+
+func beginningOfDay(t time.Time) time.Time {
+	year, month, day := t.Date()
+	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
+}
+
+func endOfDay(t time.Time) time.Time {
+	year, month, day := t.Date()
+	return time.Date(year, month, day, 23, 59, 59, 999999, t.Location())
 }
