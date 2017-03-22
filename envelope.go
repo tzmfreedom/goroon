@@ -111,7 +111,27 @@ type ScheduleEvent struct {
 }
 
 type RepeatInfo struct {
-	XMLName xml.Name `xml:"repeat_info"`
+	Condition Condition `xml:"condition"`
+}
+
+type Condition struct {
+	Type string `xml:"type,attr"`
+	Day string `xml:"day,attr"`
+	Week string `xml:"week,attr"`
+	StartDate string `xml:"start_date,attr"`
+	EndDate string `xml:"end_date,attr"`
+	StartTime string `xml:"start_time,attr"`
+	EndTime string `xml:"end_time,attr"`
+	ExclusiveDatetimes ExclusiveDatetimes `xml:"exclusive_datetimes"`
+}
+
+type ExclusiveDatetimes struct {
+	ExclusiveDatetime []ExclusiveDatetime `xml:"exclusive_datetime"`
+}
+
+type ExclusiveDatetime struct {
+	Start string `xml:"start,attr"`
+	End string `xml:"end,attr"`
 }
 
 type Members struct {
