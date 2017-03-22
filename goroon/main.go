@@ -274,6 +274,9 @@ func main() {
 }
 
 func startStr(event *goroon.ScheduleEvent) string {
+	if event.EventType == "repeat" {
+		return formatDate(event.RepeatInfo[0].Condition.StartDate)
+	}
 	if isNullTime(event.When.Datetime.Start) {
 		return formatDate(event.When.Date.Start)
 	}
@@ -281,6 +284,9 @@ func startStr(event *goroon.ScheduleEvent) string {
 }
 
 func endStr(event *goroon.ScheduleEvent) string {
+	if event.EventType == "repeat" {
+		return formatDate(event.RepeatInfo[0].Condition.StartDate)
+	}
 	if isNullTime(event.When.Datetime.End) {
 		return formatDate(event.When.Date.End)
 	}
