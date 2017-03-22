@@ -97,16 +97,26 @@ $ goroon bulleting -u {USERNAME} -p {PASSWORD} -e {ENDPOINT}
 
 ### Library
 
-Initialize
+Initialize by credentials
+
 ```
-client := goroon.NewClient("username", "password", "https://garoon.hogehoge.com/grn.exe")
+client := goroon.NewClient("https://garoon.hogehoge.com/grn.exe")
+client.Username = "input your username"
+client.Password = "input your password"
+```
+
+Initialize by sessionId
+
+```
+client := goroon.NewClient("https://garoon.hogehoge.com/grn.exe")
+client.SessionId = "input your sessionId"
 ```
 
 Get my schedule on target date
 
 ```golang
-start, err := time.Parse("2006-01-02 15:04:05", "2017-03-01 00:00:00")
-end, err := time.Parse("2006-01-02 15:04:05","2017-03-02 00:00:00")
+start := time.Date(2017, 1, 1, 0, 0, 0, 0, time.Local)
+end := time.Date(2017, 1, 1, 23, 59, 59, 999999, time.Local)
 
 res, err := client.ScheduleGetEvents(&goroon.Parameters{
   Start: goroon.XmlDateTime{start},
@@ -121,12 +131,12 @@ for _, sch := range res.ScheduleEvents {
   fmt.Println(event.EventType)
   fmt.Println(event.Detail)
   fmt.Println(event.Description)
-  if event.EventType == "banner" {
-    event.When.Date.Start.Format("2006-01-02")
-    event.When.Date.End.Format("2006-01-02")
+  if event.When.Datetime.Start == new(time.Time) {
+    fmt.Println(event.When.Date.Start.Format("2006-01-02"))
+    fmt.Println(event.When.Date.End.Format("2006-01-02")
   } else {
-    event.When.Datetime.Start.Format("2006-01-02T15:04:05")
-    event.When.Datetime.End.Format("2006-01-02T15:04:05")
+    fmt.Println(event.When.Datetime.Start.Format("2006-01-02T15:04:05"))
+    fmt.Println(event.When.Datetime.End.Format("2006-01-02T15:04:05"))
   }
 }
 ```
@@ -163,7 +173,10 @@ for _, follow := range res.Follow {
 ```
 
 Debug your request
+
 ```
-client := goroon.NewClient("username", "password", "https://garoon.hogehoge.com/grn.exe")
+client := goroon.NewClient("https://garoon.hogehoge.com/grn.exe")
 client.Debugger = os.Stdout
 ```
+Debugger property is io.Writer interface.
+You can debug out to anywhere with io.Writer.
