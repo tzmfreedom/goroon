@@ -34,7 +34,7 @@ build:
 	@go build $(LDFLAGS)
 
 .PHONY: cross-build
-cross-build: clean
+cross-build: deps
 	-@goimports -w .
 	@gofmt -w .
 	@for os in darwin linux windows; do \
