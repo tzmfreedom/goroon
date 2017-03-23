@@ -31,29 +31,15 @@ func TestScheduleGetEventsByTarget(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error is occured. %s", err.Error())
 	}
-	if len(res.ScheduleEvents) != 1 {
-		t.Fatalf("expect %v, get %v", 1, len(res.ScheduleEvents))
-	}
+	assert(t, len(res.ScheduleEvents), 1)
 	ev := res.ScheduleEvents[0]
-	if ev.Id != 123 {
-		t.Fatalf("expect %v, get %v", 123, ev.Id)
-	}
-	if ev.Detail != "fugafuga" {
-		t.Fatalf("expect %v, get %v", "fugafug", ev.Detail)
-	}
-	if ev.Description != "hogehoge" {
-		t.Fatalf("expect %v, get %v", "hogehoge", ev.Description)
-	}
-	if len(ev.Members.Member) != 1 {
-		t.Fatalf("expect %v, get %v", 1, len(ev.Members.Member))
-	}
+	assert(t, ev.Id, 123)
+	assert(t, ev.Detail, "fugafuga")
+	assert(t, ev.Description, "hogehoge")
+	assert(t, len(ev.Members.Member), 1)
 	member := ev.Members.Member[0]
-	if member.User.Id != 1 {
-		t.Fatalf("expect %v, get %v", "aa", member.User.Id)
-	}
-	if member.User.Name != "aaa" {
-		t.Fatalf("expect %v, get %v", "bb", member.User.Name)
-	}
+	assert(t, member.User.Id, 1)
+	assert(t, member.User.Name, "aaa")
 }
 
 func TestScheduleGetEvents(t *testing.T) {
@@ -76,29 +62,22 @@ func TestScheduleGetEvents(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error is occured. %s", err.Error())
 	}
-	if len(res.ScheduleEvents) != 1 {
-		t.Fatalf("expect %v, get %v", 1, len(res.ScheduleEvents))
-	}
+	assert(t, len(res.ScheduleEvents), 1)
 	ev := res.ScheduleEvents[0]
-	if ev.Id != 123 {
-		t.Fatalf("expect %v, get %v", 123, ev.Id)
-	}
-	if ev.Detail != "fugafuga" {
-		t.Fatalf("expect %v, get %v", "fugafug", ev.Detail)
-	}
-	if ev.Description != "hogehoge" {
-		t.Fatalf("expect %v, get %v", "hogehoge", ev.Description)
-	}
-	if len(ev.Members.Member) != 1 {
-		t.Fatalf("expect %v, get %v", 1, len(ev.Members.Member))
-	}
+	assert(t, ev.Id, 123)
+	assert(t, ev.Detail, "fugafuga")
+	assert(t, ev.Description, "hogehoge")
+	assert(t, len(ev.Members.Member), 1)
 	member := ev.Members.Member[0]
-	if member.User.Id != 1 {
-		t.Fatalf("expect %v, get %v", "aa", member.User.Id)
-	}
-	if member.User.Name != "aaa" {
-		t.Fatalf("expect %v, get %v", "bb", member.User.Name)
-	}
+	assert(t, member.User.Id, 1)
+	assert(t, member.User.Name, "aaa")
+	assert(t, ev.RepeatInfo.Condition.StartDate, XmlDate{time.Date(2016, 11, 22, 0, 0, 0, 0, time.UTC)})
+	assert(t, ev.RepeatInfo.Condition.EndDate, XmlDate{time.Date(2017, 4, 1, 0, 0, 0, 0, time.UTC)})
+	assert(t, ev.RepeatInfo.Condition.StartTime, "14:00:00")
+	assert(t, ev.RepeatInfo.Condition.EndTime, "14:30:00")
+	assert(t, ev.RepeatInfo.Condition.Day, 20)
+	assert(t, ev.RepeatInfo.Condition.Week, 2)
+	assert(t, ev.RepeatInfo.Condition.Type, "week")
 }
 
 func TestBaseGetUserByLoginName(t *testing.T) {
@@ -119,44 +98,20 @@ func TestBaseGetUserByLoginName(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error is occured. %s", err.Error())
 	}
-	if len(res.User) != 2 {
-		t.Fatalf("expect %v, get %v", 2, len(res.User))
-	}
+	assert(t, len(res.User), 2)
 	adm := res.User[0]
-	if adm.Key != 1 {
-		t.Fatalf("expect %v, get %v", 1, adm.Phone)
-	}
-	if adm.Version != 1245376338 {
-		t.Fatalf("expect %v, get %v", 1245376338, adm.LoginName)
-	}
-	if adm.Name != "Administrator" {
-		t.Fatalf("expect %v, get %v", "Administrator", adm.Name)
-	}
-	if adm.Status != 0 {
-		t.Fatalf("expect %v, get %v", 0, adm.Phone)
-	}
+	assert(t, adm.Key, 1)
+	assert(t, adm.Version, 1245376338)
+	assert(t, adm.Name, "Administrator")
+	assert(t, adm.Status, 0)
 	u1 := res.User[1]
-	if u1.Key != 2 {
-		t.Fatalf("expect %v, get %v", 2, u1.Phone)
-	}
-	if u1.Version != 1245919830 {
-		t.Fatalf("expect %v, get %v", 1245919830, u1.LoginName)
-	}
-	if u1.Name != "u1" {
-		t.Fatalf("expect %v, get %v", "u1", u1.Name)
-	}
-	if u1.Status != 0 {
-		t.Fatalf("expect %v, get %v", 0, u1.Phone)
-	}
-	if u1.Phone != "9180xxxxxx" {
-		t.Fatalf("expect %v, get %v", "9180xxxxxx", u1.Phone)
-	}
-	if u1.Description != "user1 is ..." {
-		t.Fatalf("expect %v, get %v", "user1 is ...", u1.Description)
-	}
-	if u1.Title != "test test" {
-		t.Fatalf("expect %v, get %v", "test test", u1.Title)
-	}
+	assert(t, u1.Key, 2)
+	assert(t, u1.Version, 1245919830)
+	assert(t, u1.Name, "u1")
+	assert(t, u1.Status, 0)
+	assert(t, u1.Phone, "9180xxxxxx")
+	assert(t, u1.Description, "user1 is ...")
+	assert(t, u1.Title, "test test")
 }
 
 func TestBulletinGetFollows(t *testing.T) {
@@ -179,12 +134,8 @@ func TestBulletinGetFollows(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error is occured. %s", err.Error())
 	}
-	if len(res.Follow) != 4 {
-		t.Fatalf("expect %v, get %v", 4, len(res.Follow))
-	}
-	if res.Follow[0].Creator.Name != "huy" {
-		t.Fatalf("expect %v, get %v", "huy", res.Follow[0].Creator.Name)
-	}
+	assert(t, len(res.Follow), 4)
+	assert(t, res.Follow[0].Creator.Name, "huy")
 }
 
 func TestUtilLogin(t *testing.T) {
@@ -209,10 +160,13 @@ func TestUtilLogin(t *testing.T) {
 	if !strings.Contains(res.Cookie, "CBSESSID=C735B4069ccf104Ce0f2bf12a7cc62f115db9e676f6e72f2;") {
 		t.Fatalf("expect %v, get %v", "", res.Cookie)
 	}
-	if res.LoginName != "Administrator" {
-		t.Fatalf("expect %v, get %v", "Administrator", res.LoginName)
-	}
-	if res.Status != "Login" {
-		t.Fatalf("expect %v, get %v", "Login", res.Status)
+	assert(t, res.LoginName, "Administrator")
+	assert(t, res.Status, "Login")
+}
+
+
+func assert(t *testing.T, expect interface{}, actual interface{}) {
+	if expect != actual {
+		t.Fatalf("expect %v, get %v", expect, actual)
 	}
 }

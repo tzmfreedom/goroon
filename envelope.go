@@ -102,7 +102,7 @@ type Creator struct {
 
 type ScheduleEvent struct {
 	Members     Members      `xml:"members"`
-	RepeatInfo  []RepeatInfo `xml:"repeat_info"`
+	RepeatInfo  RepeatInfo `xml:"repeat_info"`
 	When        When         `xml:"when"`
 	Detail      string       `xml:"detail,attr"`
 	Description string       `xml:"description,attr"`
@@ -116,8 +116,8 @@ type RepeatInfo struct {
 
 type Condition struct {
 	Type string `xml:"type,attr"`
-	Day string `xml:"day,attr"`
-	Week string `xml:"week,attr"`
+	Day int `xml:"day,attr"`
+	Week int `xml:"week,attr"`
 	StartDate XmlDate `xml:"start_date,attr"`
 	EndDate XmlDate `xml:"end_date,attr"`
 	StartTime string `xml:"start_time,attr"`
