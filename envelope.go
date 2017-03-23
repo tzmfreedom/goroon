@@ -118,8 +118,8 @@ type Condition struct {
 	Type string `xml:"type,attr"`
 	Day string `xml:"day,attr"`
 	Week string `xml:"week,attr"`
-	StartDate string `xml:"start_date,attr"`
-	EndDate string `xml:"end_date,attr"`
+	StartDate XmlDate `xml:"start_date,attr"`
+	EndDate XmlDate `xml:"end_date,attr"`
 	StartTime string `xml:"start_time,attr"`
 	EndTime string `xml:"end_time,attr"`
 	ExclusiveDatetimes ExclusiveDatetimes `xml:"exclusive_datetimes"`
