@@ -386,10 +386,10 @@ func printFollow(f *goroon.Follow, cols []string) {
 		switch col {
 		case "id":
 			print_col = fmt.Sprint(f.Number)
-		case "members":
+		case "creator":
 			print_col = f.Creator.Name
 		case "text":
-			print_col = strings.Replace(f.Text, "\n", "", -1)
+			print_col = strings.Replace(f.Text, "\r\n", " ", -1)
 		}
 		print_cols = append(print_cols, print_col)
 	}
