@@ -135,7 +135,7 @@ func main() {
 				cli.StringFlag{
 					Name:        "columns, c",
 					Destination: &c.Columns,
-					Value:       "id,type,start,end,description,detail",
+					Value:       "detail,start,end",
 				},
 				cli.BoolFlag{
 					Name:        "debug, D",
@@ -259,7 +259,7 @@ func main() {
 				cli.StringFlag{
 					Name:        "columns, c",
 					Destination: &c.Columns,
-					Value:       "id,creator,text",
+					Value:       "creator,text",
 				},
 			},
 			Action: func(ctx *cli.Context) error {
@@ -285,7 +285,7 @@ func main() {
 
 func startStr(event *goroon.ScheduleEvent) string {
 	if event.EventType == "repeat" {
-		return formatDate(event.RepeatInfo.Condition.StartDate)
+		return fmt.Sprintf("%sT%s", time.Now().Format("2006-01-02"), event.RepeatInfo.Condition.StartTime)
 	}
 	if isNullTime(event.When.Datetime.Start) {
 		return formatDate(event.When.Date.Start)
@@ -295,7 +295,7 @@ func startStr(event *goroon.ScheduleEvent) string {
 
 func endStr(event *goroon.ScheduleEvent) string {
 	if event.EventType == "repeat" {
-		return formatDate(event.RepeatInfo.Condition.StartDate)
+		return fmt.Sprintf("%sT%s", time.Now().Format("2006-01-02"), event.RepeatInfo.Condition.EndTime)
 	}
 	if isNullTime(event.When.Datetime.End) {
 		return formatDate(event.When.Date.End)
