@@ -164,7 +164,6 @@ func TestUtilLogin(t *testing.T) {
 	assert(t, res.Status, "Login")
 }
 
-
 func assert(t *testing.T, expect interface{}, actual interface{}) {
 	if expect != actual {
 		t.Fatalf("expect %v, get %v", expect, actual)
