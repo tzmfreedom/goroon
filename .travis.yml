@@ -2,14 +2,17 @@ language: go
 install:
 - go get -t ./...
 before_deploy:
-  - make cross-build
-  - make dist
+- make cross-build
+- make dist
 deploy:
   provider: releases
   api_key:
     secure: aHgkiqcVuGoVOUZtZ2lUv8Erm7IZzg9qH2op+Sv6AEMXQKX+6QjbQIVVIRjR21M/ME1/GagZDgIikbLa11Ts0SqoxE65HqAO2Phkv8QPolD3PMMVq7zFGaUNn0FzeWEsQZz4+Q/anlhd/0c0HK6N0LuKq8IfKbc/udmSGFgRgvA2iLqdWVT5Qtvopz8xx7gQKsPj8BVvDDKfBuEoV+2auGfeeCc7UJCFtDjqMKBDkQgRIVJY/tYhEMpn7pR6KSp7cYgv7KWPjPw9jrDLDqLk73rDov6z3S29TsrOw9osunPp9iDSKAL65KfhyDPAy+DtqeDQgeTc6q33ATa4wCKQM75NhAE8srnEv6TVd41CnChAtus5WoU+hqRMUYm7itms71o6lkLhq6DDP3y6Nn1qfUes/SBUmi5U4Jnt/sYvGpehMxzRu4LUy1TR8g550GmBrG6kpZoGkfjmbd/K8YMIJvCcV52wKZ2izX9AZxRYzTJ7mDFgxhJbucFCYpE6UiDTSZsHUO+WvSUgypwj6Do6Vo8qyau4ouWvM/JU9IcnyuB+WtZG6bhw68fxC5mHYE0iYPXTfojcUtHKLrV4fL9iqtr+ohfblArmMwyxAW5YXxElCLQY8kYWu39VKsPrvdUITXM8VM1RbuYQSMCKOkwMfrTxweOyefZWY/PIFF2S9XA=
   file_glob: true
-  file: 'dist/*.{tar.gz}'
+  file: dist/*.{tar.gz}
   on:
     repo: tzmfreedom/goroon
     tags: true
+env:
+  global:
+  - secure: OVO08z74sHcD/viOxGY5fsz+jwUsFLVk7KsguwJ5rRyiyfwNcqS0j6nipn/9LS3gIrFf5WtCUrNFlRAagn1JAt3TiVQfkQRjmXtyvBBoKBfji4lhM/cy/zRB+qFXISps2TNam5/7XxJXPpoi3dCnzYxFuIZN7zhvhVT4q70OJ8jJ6CfvQOqK8yP2PGYe6oBFf1lYqzKF7wOypLH/uXk95cadQRF/eDAGi3B+/hitFzv+u1tIskEhng2I2oh0OfQ/XnK/ZPhJlXXjdzii0VvbQ1MRvYNwGTfx10rnorWfJLmRdrzVGw7o8UwBBy2sXQ3vD5uCIy43Ofk27LhQj5fBQJcHwbEUHX27EL0f2TGraJ+bYIFcv11/J2DK0foW7mMlmBEIWUF/fu0xjoa/NUdIUURmZU/Df59ThIdbh1VIQNi9X6LZfk2rqG0Y3jVL4x4TJwPUVWag6D6uaLgZZlRwAVYeAZfJ/aM7NkjLvJHJLmyiMt0HDpA23J84YGS1lAxkb37D6zduZoiAjiMGd/07lJrGtILXKTvxbBsQpYKiiP+rA2pKLMse4llrDTyWD5UBreyHWy1nFIPyGuqrDKGpNzNKidCCc/RGtfLEcmZwNesmSNrmcp8KusfWr4Pt2ZwYVpJMNrnWSlk16SU0oJBa2o5VBgGNVkXrFElQ46gQcA4=
