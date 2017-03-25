@@ -1,9 +1,13 @@
 language: go
+before_install:
+  - sudo add-apt-repository ppa:masterminds/glide -y
+  - sudo apt-get update -q
+  - sudo apt-get install glide -y
 install:
-- go get -t ./...
+  - go get -t ./...
 before_deploy:
-- make cross-build
-- make dist
+  - make cross-build
+  - make dist
 deploy:
   provider: releases
   api_key:
