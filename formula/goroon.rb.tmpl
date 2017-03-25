@@ -1,0 +1,25 @@
+class Goroon < Formula
+  desc "Garoon Command Line Interface"
+  homepage "https://github.com/tzmfreedom/goroon"
+
+  @@version = "{VERSION}"
+  version @@version
+
+  if Hardware::CPU.is_64_bit?
+    url "https://github.com/tzmfreedom/goroon/releases/download/v#{@@version}/goroon-#{@@version}-darwin-amd64.tar.gz"
+    sha256 '{SHA256_AMD64}'
+  else
+    url "https://github.com/tzmfreedom/goroon/releases/download/v#{@@version}/goroon-#{@@version}-darwin-386.tar.gz"
+    sha256 '{SHA256_386}'
+  end
+
+  def install
+    bin.install 'goroon'
+  end
+
+  test do
+    system "false"
+  end
+end
+
+

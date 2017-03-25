@@ -70,7 +70,7 @@ dist:
 update-formula:
 	@wget https://raw.githubusercontent.com/tzmfreedom/homebrew-$(NAME)/master/$(NAME).rb
 	@cat formula/goroon.rb.tmpl | \
-	@sed -e 's/{VERSION}/$(VERSION)/g' -e 's/{SHA256_AMD64}/$(SHA256_AMD64)/g' \
+	sed -e 's/{VERSION}/$(VERSION)/g' -e 's/{SHA256_AMD64}/$(SHA256_AMD64)/g' \
 	  -e 's/{SHA256_386}/$(SHA256_386)/g' > formula.rb
 	curl -i -X PUT \
 	  -H "Content-Type:application/json" \
