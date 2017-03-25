@@ -3,8 +3,11 @@ SRCS := $(shell find . -type d -name vendor -prune -o -type f -name "*.go" -prin
 VERSION := 0.1.0
 REVISION := $(shell git rev-parse --short HEAD)
 LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\"" 
+DIST_DIRS := find * -type d -exec
+SHA256_386 = $(shell cat dist/darwin-386/goroon | openssl dgst -sha256)
+SHA256_AMD64 = $(shell cat dist/darwin-amd64/goroon | openssl dgst -sha256)
 
-.DEFAULT_GOAL := bin/$(NAME) 
+.DEFAULT_GOAL := test
 
 .PHONY: test
 test: glide
@@ -35,12 +38,10 @@ build:
 
 .PHONY: cross-build
 cross-build: deps
-	-@goimports -w .
-	@gofmt -w .
 	@for os in darwin linux windows; do \
 	    for arch in amd64 386; do \
 	        GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo \
-	        -installsuffix netgo $(LDFLAGS) -o dist/$(NAME)-$$os-$$arch; \
+	        -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME) ./goroon; \
 	    done; \
 	done
 
@@ -60,4 +61,14 @@ bin/$(NAME): $(SRCS)
 
 .PHONY: dist
 dist:
-	@tar czfh $(NAME).tar.gz $(shell git ls-files)
+	@cd dist && \
+	$(DIST_DIRS) cp ../LICENSE {} \; && \
+	$(DIST_DIRS) cp ../README.md {} \; && \
+	$(DIST_DIRS) tar zcf $(NAME)-$(VERSION)-{}.tar.gz {} \;
+
+.PHONY: update-formula
+update-formula:
+	@-git clone https://github.com/tzmfreedom/homebrew-$(NAME)
+	@cat formula/goroon.rb.tmpl | \
+	sed -e 's/{VERSION}/$(VERSION)/g' -e 's/{SHA256_AMD64}/$(SHA256_AMD64)/g' \
+	-e 's/{SHA256_386}/$(SHA256_386)/g' > homebrew-$(NAME)/$(NAME).rb
