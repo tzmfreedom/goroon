@@ -2,17 +2,24 @@
 
 # Goroon
 
-Command Line Interface for Garoon with Go language
+Command Line Interface and Library for Garoon with Go language
 
 ## Install
 
-CLI
+### CLI
 
+MacOS user can use homebrew to install goroon
 ```bash
-$ go get github.com/tzmfreedom/goroon/goroon
+$ brew tap tzmfreedom/goroon
+$ brew install goroon
 ```
 
-Library
+If you want to use most recently version of goroon, execute following command.
+```bash
+$ go get -u github.com/tzmfreedom/goroon/goroon
+```
+
+### Library
 
 ```bash
 $ go get github.com/tzmfreedom/goroon
@@ -28,10 +35,11 @@ USAGE:
    goroon [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.0
+   0.1.0
 
 COMMANDS:
-     schedule, s  get today's your schedule
+     login, l     login to garoon
+     schedule, s  get your schedule
      bulletin, b  get bulletin
      help, h      Shows a list of commands or help for one command
 
@@ -43,7 +51,7 @@ GLOBAL OPTIONS:
 Get schedule on target date
 ```
 NAME:
-   goroon schedule - get today's your schedule
+   goroon schedule - get your schedule
 
 USAGE:
    goroon schedule [command options] [arguments...]
@@ -53,19 +61,24 @@ OPTIONS:
    --password value, -p value   [$GAROON_PASSWORD]
    --endpoint value, -e value   [$GAROON_ENDPOINT]
    --userid value, -i value
-   --debug, -d
    --start value
    --end value
-   --type value                (default: "all")
+   --type value, -t value      (default: "all")
+   --columns value, -c value   (default: "detail,start,end")
+   --debug, -D
+   --date value, -d value
 ```
 
 Get my schedule on target date
 ```bash
 $ goroon schedule -u {USERNAME} -p {PASSWORD} -e {ENDPOINT} --start {START DATETIME} --end {END DATETIME}
+$ goroon schedule -u {USERNAME} -p {PASSWORD} -e {ENDPOINT} -d {DATE:[today|yesterday]}
 
 ex)
 $ goroon schedule -u hoge -p fuga -e https//hoge.garoon.com/grn.exe \
-  --start '2017-03-01 00:00:00' --end '2017-03-02 00:00:00'
+  --start '2017-03-01 00:00:00' --end '2017-03-01 23:59:59'
+$ goroon schedule -u hoge -p fuga -e https//hoge.garoon.com/grn.exe -d today # get today's your schedule
+$ goroon schedule -u hoge -p fuga -e https//hoge.garoon.com/grn.exe # get today's your schedule
 ```
 
 Get target user's schedule
@@ -86,13 +99,40 @@ OPTIONS:
    --password value, -p value   [$GAROON_PASSWORD]
    --endpoint value, -e value   [$GAROON_ENDPOINT]
    --topic_id value            (default: 0)
-   --debug, -d
    --offset value, -o value    (default: 0)
-   --limit value, -l value     (default: 0)
+   --limit value, -l value     (default: 20)
+   --debug, -D
+   --columns value, -c value   (default: "creator,text")
 ```
 
 ```bash
 $ goroon bulleting -u {USERNAME} -p {PASSWORD} -e {ENDPOINT}
+```
+
+Login to garoon
+```bash
+NAME:
+   goroon login - login to garoon
+
+USAGE:
+   goroon login [command options] [arguments...]
+
+OPTIONS:
+   --username value, -u value   [$GAROON_USERNAME]
+   --password value, -p value   [$GAROON_PASSWORD]
+   --endpoint value, -e value   [$GAROON_ENDPOINT]
+   --debug, -D
+ex)
+$ goroon login -u hoge -p fuga -e "https://hoge.garoon.com/grn.exe"
+```
+The credentials, that is username, password, endpoint, is required on any goroon command.
+For this reason, it's hard to use these commands. Login subcommand solve the problem.
+If you call garoon login subcommand, goroon create `.goroon` file on your home path and write session id and endpoint on it.
+When `.goroon` file exists, every command read `.goroon` file and use information on file to login to garoon.
+
+For example, if you called login command, you can use the following command to get your schedule on today.
+```bash
+$ goroon schedule
 ```
 
 ### Library
@@ -100,7 +140,7 @@ $ goroon bulleting -u {USERNAME} -p {PASSWORD} -e {ENDPOINT}
 Initialize by credentials
 
 ```
-client := goroon.NewClient("https://garoon.hogehoge.com/grn.exe")
+client := goroon.NewClient("input garoon endpoint")
 client.Username = "input your username"
 client.Password = "input your password"
 ```
@@ -108,7 +148,7 @@ client.Password = "input your password"
 Initialize by sessionId
 
 ```
-client := goroon.NewClient("https://garoon.hogehoge.com/grn.exe")
+client := goroon.NewClient("input garoon endpoint")
 client.SessionId = "input your sessionId"
 ```
 
