@@ -15,7 +15,7 @@ test: glide
 
 .PHONY: install
 install: build
-	@go install ./goroon
+	@go install ./cmd
 
 .PHONY: uninstall
 uninstall:
@@ -41,7 +41,7 @@ cross-build: deps
 	@for os in darwin linux windows; do \
 	    for arch in amd64 386; do \
 	        GOOS=$$os GOARCH=$$arch CGO_ENABLED=0 go build -a -tags netgo \
-	        -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME) ./goroon; \
+	        -installsuffix netgo $(LDFLAGS) -o dist/$$os-$$arch/$(NAME) ./cmd; \
 	    done; \
 	done
 
@@ -57,7 +57,7 @@ deps: glide
 
 .PHONY: bin/$(NAME) 
 bin/$(NAME): $(SRCS)
-	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$(NAME) ./goroon
+	go build -a -tags netgo -installsuffix netgo $(LDFLAGS) -o bin/$(NAME) ./cmd
 
 .PHONY: dist
 dist:
@@ -78,4 +78,4 @@ release:
 	  -d \
 	  "{\"path\":\"$(NAME).rb\",\"sha\":\"$$(git hash-object $(NAME).rb)\",\"content\":\"$$(cat formula.rb | openssl enc -e -base64 | tr -d '\n ')\",\"message\":\"Update version $(VERSION)\"}" \
 	  'https://api.github.com/repos/tzmfreedom/homebrew-$(NAME)/contents/$(NAME).rb'
-
+	@rm formula.rb $(NAME).rb
