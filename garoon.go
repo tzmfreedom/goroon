@@ -42,7 +42,6 @@ func (c *Client) Request(action string, path string, req interface{}, res interf
 	envelope.SoapBody = &SoapBody{Content: req}
 	b, err := xml.MarshalIndent(envelope, "", "	")
 	c.Debugger.Write(b)
-
 	msg, err := xml.Marshal(envelope)
 	if err != nil {
 		return err
@@ -63,7 +62,7 @@ func (c *Client) Request(action string, path string, req interface{}, res interf
 		return err
 	}
 	if res_env.SoapBody.Fault != nil {
-		msg := fmt.Sprintf("Soap Fault is occured: %s: %s", res_env.SoapBody.Fault.Code, res_env.SoapBody.Fault.Detail)
+		msg := fmt.Sprintf("Soap Fault is occured: %s: %s", res_env.SoapBody.Fault.Detail.Diagnosis, res_env.SoapBody.Fault.Detail.Cause)
 		return errors.New(msg)
 	}
 	return nil

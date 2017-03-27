@@ -28,10 +28,10 @@ type SoapHeader struct {
 type SoapFault struct {
 	XMLName xml.Name `xml:"http://www.w3.org/2003/05/soap-envelope Fault"`
 
-	Code   string `xml:"Code,omitempty"`
-	Reason string `xml:"Reason,omitempty"`
-	Actor  string `xml:"Actor,omitempty"`
-	Detail string `xml:"Detail,omitempty"`
+	Code   string      `xml:"Code>Value,omitempty"`
+	Reason string      `xml:"Reason>Text,omitempty"`
+	Actor  string      `xml:"Actor,omitempty"`
+	Detail FaultDetail `xml:"Detail,omitempty"`
 }
 
 type FaultDetail struct {
