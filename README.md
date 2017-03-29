@@ -14,7 +14,7 @@ $ brew tap tzmfreedom/goroon
 $ brew install goroon
 ```
 
-If you want to use most recently version of goroon, execute following command.
+If you want to use latest version of goroon, execute following command.
 ```bash
 $ go get -u github.com/tzmfreedom/goroon/goroon
 ```
