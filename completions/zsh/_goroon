@@ -1,0 +1,13 @@
+#compdef goroon
+
+function __goroon_subcommands() {
+  _values -w '' \
+    'schedule[list schedules]' \
+    'bulletin[list bulletin follows]'
+}
+
+_arguments \
+  '(- 1)'{-h,--help}'[show help]' \
+  '1: :__goroon_subcommands'
+
+

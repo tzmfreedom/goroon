@@ -5,6 +5,8 @@ class Goroon < Formula
   @@version = "{VERSION}"
   version @@version
 
+  option "without-completions", "Disable zsh completions"
+
   if Hardware::CPU.is_64_bit?
     url "https://github.com/tzmfreedom/goroon/releases/download/v#{@@version}/goroon-#{@@version}-darwin-amd64.tar.gz"
     sha256 '{SHA256_AMD64}'
@@ -15,6 +17,9 @@ class Goroon < Formula
 
   def install
     bin.install 'goroon'
+    if build.with? 'completions'
+      zsh_completion.install '_goroon'
+    end
   end
 
   test do

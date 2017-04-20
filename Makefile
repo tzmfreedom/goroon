@@ -1,6 +1,6 @@
 NAME := goroon
 SRCS := $(shell find . -type d -name vendor -prune -o -type f -name "*.go" -print)
-VERSION := 0.1.1
+VERSION := 0.1.2
 REVISION := $(shell git rev-parse --short HEAD)
 LDFLAGS := -ldflags="-s -w -X \"main.Version=$(VERSION)\" -X \"main.Revision=$(REVISION)\"" 
 DIST_DIRS := find * -type d -exec
@@ -64,6 +64,7 @@ dist:
 	@cd dist && \
 	$(DIST_DIRS) cp ../LICENSE {} \; && \
 	$(DIST_DIRS) cp ../README.md {} \; && \
+	$(DIST_DIRS) cp ../completions/zsh/_goroon {} \; && \
 	$(DIST_DIRS) tar zcf $(NAME)-$(VERSION)-{}.tar.gz {} \;
 
 .PHONY: release
