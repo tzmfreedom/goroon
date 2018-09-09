@@ -10,8 +10,8 @@ SHA256_AMD64 = $(shell cat dist/goroon-$(VERSION)-darwin-amd64.tar.gz | openssl 
 .DEFAULT_GOAL := test
 
 .PHONY: test
-test: glide
-	@go test -cover -v `glide novendor`
+test:
+	@go test -cover -v ./...
 
 .PHONY: install
 install: build
