@@ -45,15 +45,15 @@ cross-build: deps
 	    done; \
 	done
 
-.PHONY: glide
-glide:
-ifeq ($(shell command -v glide 2> /dev/null),)
-	curl https://glide.sh/get | sh
+.PHONY: dep
+dep:
+ifeq ($(shell command -v dep 2> /dev/null),)
+	curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 endif
 
 .PHONY: deps
-deps: glide
-	glide install
+deps: dep
+	dep ensure
 
 .PHONY: bin/$(NAME) 
 bin/$(NAME): $(SRCS)
