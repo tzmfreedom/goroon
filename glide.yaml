@@ -1,8 +1,0 @@
-package: github.com/tzmfreedom/goroon
-import:
-- package: github.com/urfave/cli
-  version: v1.19.1
-- package: github.com/mitchellh/go-homedir
-testImport:
-- package: gopkg.in/h2non/gock.v1
-  version: v1.0.4
