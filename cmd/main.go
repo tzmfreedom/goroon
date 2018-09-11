@@ -89,7 +89,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				r := regexp.MustCompile(`CBSESSID=(.+?);`)
+				r := regexp.MustCompile(client.SessionKey + `=(.+?);`)
 				group := r.FindAllStringSubmatch(res.Cookie, -1)
 				createConfigFile(group[0][1], c.Endpoint)
 				return err
@@ -339,17 +339,18 @@ func readConfigFile() (*configFile, error) {
 }
 
 func newGaroonClient(c *config) *goroon.Client {
-	client := goroon.NewClient(c.Endpoint)
-	if c.Debug {
-		client.Debugger = os.Stdout
-	}
+	var client *goroon.Client
 	cf, err := readConfigFile()
 	if err == nil {
+		client = goroon.NewClient(cf.Endpoint)
 		client.SessionId = cf.SessionId
-		client.Endpoint = cf.Endpoint
 	} else {
+		client = goroon.NewClient(c.Endpoint)
 		client.Username = c.Username
 		client.Password = c.Password
+	}
+	if c.Debug {
+		client.Debugger = os.Stdout
 	}
 	return client
 }

@@ -10,16 +10,25 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"regexp"
 	"time"
 )
 
+const (
+	packageVerSessionKey = "CBSESSID"
+	cloudVerSessionKey   = "JSESSIONID"
+)
+
+var cloudURLPattern = regexp.MustCompile("[a-z]+.cybozu.com")
+
 type Client struct {
-	Endpoint  string
-	Username  string
-	Password  string
-	Locale    string
-	Debugger  io.Writer
-	SessionId string
+	Endpoint   string
+	Username   string
+	Password   string
+	Locale     string
+	Debugger   io.Writer
+	SessionKey string
+	SessionId  string
 }
 
 type NopWriter struct{}
@@ -29,10 +38,16 @@ func (d *NopWriter) Write(b []byte) (int, error) {
 }
 
 func NewClient(endpoint string) *Client {
+	sessionKey := packageVerSessionKey
+	if cloudURLPattern.MatchString(endpoint) {
+		sessionKey = cloudVerSessionKey
+	}
+
 	return &Client{
-		Endpoint: endpoint,
-		Locale:   "ja",
-		Debugger: &NopWriter{},
+		Endpoint:   endpoint,
+		Locale:     "ja",
+		Debugger:   &NopWriter{},
+		SessionKey: sessionKey,
 	}
 }
 
@@ -161,7 +176,7 @@ func (c *Client) createHttpClient() *http.Client {
 	if c.SessionId != "" {
 		u, _ := url.Parse(c.Endpoint)
 		cookie := &http.Cookie{
-			Name:   "CBSESSID",
+			Name:   c.SessionKey,
 			Value:  c.SessionId,
 			Path:   "/",
 			Domain: u.Host,
