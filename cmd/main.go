@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -89,9 +91,11 @@ func main() {
 				if err != nil {
 					return err
 				}
-				r := regexp.MustCompile(`CBSESSID=(.+?);`)
-				group := r.FindAllStringSubmatch(res.Cookie, -1)
-				createConfigFile(group[0][1], c.Endpoint)
+				session, err := getSession(c.Endpoint, res)
+				if err != nil {
+					return err
+				}
+				createConfigFile(session, c.Endpoint)
 				return err
 			},
 		},
@@ -421,4 +425,31 @@ func beginningOfDay(t time.Time) time.Time {
 func endOfDay(t time.Time) time.Time {
 	year, month, day := t.Date()
 	return time.Date(year, month, day, 23, 59, 59, 999999, t.Location())
+}
+
+func isCloud(endpoint string) bool {
+	u, err := url.Parse(endpoint)
+	if err != nil {
+		return false
+	}
+	r := regexp.MustCompile(`.cybozu.com$`)
+	return r.MatchString(u.Host)
+}
+
+func getSession(endpoint string, res *goroon.Returns) (string, error) {
+	var r *regexp.Regexp
+	if isCloud(endpoint) {
+		r = regexp.MustCompile(`JSESSIONID=(.+?);`)
+	} else {
+		r = regexp.MustCompile(`CBSESSID=(.+?);`)
+	}
+	group := r.FindAllStringSubmatch(res.Cookie, -1)
+	if len(group) == 0 {
+		return "", errors.New("Authentication Failure: not match cookie response")
+	}
+	if len(group[0]) <= 1 {
+		return "", errors.New("Authentication Failure: not match cookie response")
+	}
+
+	return group[0][1], nil
 }
